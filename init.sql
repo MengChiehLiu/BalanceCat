@@ -26,8 +26,7 @@ CREATE TABLE subjects(
 CREATE TABLE entries(
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    description VARCHAR(255),
-    timestamp DATETIME DEFAULT NOW(),
+    timestamp DATETIME NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -39,7 +38,7 @@ CREATE TABLE registers(
     subject_id INT NOT NULL,
     initial_value INT NOT NULL,
     book_value INT NOT NULL,
-    expired_in INT NOT NULL,
+    expired_in INT,
     is_expired TINYINT DEFAULT 0,
     FOREIGN KEY (entry_id) REFERENCES entries(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -48,11 +47,12 @@ CREATE TABLE registers(
 
 -- 分錄細項
 CREATE TABLE entryDetails(
+    id INT AUTO_INCREMENT PRIMARY KEY,
     entry_id INT NOT NULL,
     subject_id INT NOT NULL,
     register_id INT,
     amount INT NOT NULL,
-    PRIMARY KEY (entry_id, subject_id),
+    description VARCHAR(255),
     FOREIGN KEY (entry_id) REFERENCES entries(id) ON DELETE CASCADE,
     FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE,
     FOREIGN KEY (register_id) REFERENCES registers(id) ON DELETE CASCADE

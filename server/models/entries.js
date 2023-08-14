@@ -1,7 +1,7 @@
 const SqlClient = require('../utils/ORM');
 
 
-async function entriesRecord(user_id, details, description, timestamp){
+async function entriesRecord(user_id, details, timestamp){
     client = new SqlClient();
     await client.connect();
 
@@ -10,7 +10,7 @@ async function entriesRecord(user_id, details, description, timestamp){
 
         // insert entry
         const [result] = await client
-            .insert('entries', {'user_id': user_id, 'description': description, 'timestamp': timestamp})
+            .insert('entries', {'user_id': user_id, 'timestamp': timestamp})
             .query()
 
         const entry_id = result.insertId;
@@ -20,9 +20,9 @@ async function entriesRecord(user_id, details, description, timestamp){
 
 
         // insert entry details
-        client.insertColumns('entryDetails', 'entry_id, subject_id, register_id, amount');
+        client.insertColumns('entryDetails', 'entry_id, subject_id, register_id, amount, description');
         let values = []
-        for (let datail of details) values.push([entry_id, datail.subject_id, null, datail.amount])
+        for (let datail of details) values.push([entry_id, datail.subject_id, null, datail.amount, datail.description])
         await client.insertValues(values).query()
 
         await client.commit();

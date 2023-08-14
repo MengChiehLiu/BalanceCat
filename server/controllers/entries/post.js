@@ -2,7 +2,7 @@ const router = require('express').Router();
 
 // import middlewares
 const {checkContentType, checkAuthorization, checkBody} = require('../../utils/checkRequest');
-const toCheck = ['details', 'description', 'timestamp'];
+const toCheck = ['details', 'timestamp'];
 
 // import models
 const {entriesRecord} = require('../../models/entries');
@@ -19,17 +19,14 @@ async function routerPost(res, user_id, details, description, timestamp){
     };
 };
 
-// router checkAuthorization, checkContentType(),
-router.post( '/', checkBody(toCheck), async(req, res)=>{
+// router checkAuthorization
+router.post( '/', checkContentType(), checkBody(toCheck), async(req, res)=>{
     // const user_id = req.user._id;
     const user_id = 1;
     const details = req.body.details;
-    const description = req.body.description;
     const timestamp = req.body.timestamp;
 
-    await routerPost(res, user_id, details, description, timestamp);
-
-
+    await routerPost(res, user_id, details, timestamp);
 });
 
 module.exports = router;
