@@ -11,7 +11,7 @@ async function routerPost(res, user_id, details, description, timestamp){
     try{
         const entry_id = await entriesRecord(user_id, details, description, timestamp);
         if (entry_id) return res.json({data: {entry: {id: entry_id}}});
-        return res.status(400).json({data});
+        return res.status(400).json({error: 'Invalid Entry'});
 
     }catch(err){
         console.log(err);

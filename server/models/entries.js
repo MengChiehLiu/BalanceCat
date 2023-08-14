@@ -1,5 +1,5 @@
 const SqlClient = require('../utils/ORM');
-
+const {register, writeOff} = require('../models/registers')
 
 async function entriesRecord(user_id, details, timestamp){
     client = new SqlClient();
@@ -16,14 +16,25 @@ async function entriesRecord(user_id, details, timestamp){
         const entry_id = result.insertId;
         client.clear();
         
-        // handle register state
 
+        // register & reformating details
+        let values = []
+
+        for (let detail of details){
+            let register_id = null;
+
+            if (detail.register) {
+                register_id = detail.register.id;
+                if (register_id) await writeOff(client, user_id, register_id, detail.amount);
+                else register_id = await register(client, user_id, entry_id, detail);
+            }
+            
+            values.push([entry_id, detail.subject_id, register_id, detail.amount, detail.description]);
+        }
 
         // insert entry details
         client.insertColumns('entryDetails', 'entry_id, subject_id, register_id, amount, description');
-        let values = []
-        for (let datail of details) values.push([entry_id, datail.subject_id, null, datail.amount, datail.description])
-        await client.insertValues(values).query()
+        await client.insertValues(values).query();
 
         await client.commit();
         return entry_id;
