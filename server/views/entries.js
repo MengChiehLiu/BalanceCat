@@ -1,5 +1,5 @@
 const router = require('express').Router();
 
-router.use('/', require('../controllers/entries/record.js'));
+router.use('/', require('../controllers/entries/post.js'));
 
 module.exports = router;
