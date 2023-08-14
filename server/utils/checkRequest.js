@@ -34,7 +34,7 @@ function checkBody(fields){
     return function(req, res, next){
         const body = req.body;
         for (let field of fields)
-            if (!body[field]) return res.status(401).json({error: `Request Body Imcomplete: ${field} not found`});
+            if (body[field] === undefined) return res.status(401).json({error: `Request Body Imcomplete: ${field} not found`});
         next();
     };
 };

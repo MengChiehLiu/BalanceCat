@@ -7,9 +7,11 @@ CREATE TABLE users(
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
-    password VARCHAR(255),
+    password VARCHAR(255) NOT NULL,
     picture VARCHAR(255)
 );
+
+INSERT INTO users (name, email, password) VALUES ('Jack', 'test@gmail.com', 'test');
 
 -- 會計科目
 CREATE TABLE subjects(

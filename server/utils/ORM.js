@@ -62,8 +62,8 @@ class SqlClient{
     }; 
 
     // operations
-    select(table, columns=['*']){
-        this._query += `SELECT ${columns.join(', ')} FROM ${table} `
+    select(table, columns='*'){
+        this._query += `SELECT ${columns} FROM ${table} `
         return this
     };
 
@@ -92,7 +92,18 @@ class SqlClient{
         const questions = Array(keys.length).fill('?').join(', ');
         this._query += `INSERT INTO ${table} (${keys.join(', ')}) VALUES (${questions}) `;
         this.values.push(...Object.values(dict));
-        return this
+        return this;
+    };
+
+    insertColumns(table, columns){
+        this._query +=  `INSERT INTO ${table} (${columns}) VALUES `
+        return this;
+    }
+
+    insertValues(values){
+        this._query += `?`;
+        this.values.push(values);
+        return this;
     };
 
     update(table, dict){
