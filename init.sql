@@ -163,11 +163,39 @@ INSERT INTO subjects (id, name, is_debit, parent_id) VALUES
 
 -- mock data
 INSERT INTO users (name, email, password) VALUES ('Jack', 'test@gmail.com', 'test');
-INSERT INTO entries (user_id, timestamp) VALUES (1, '2023/07/01 23:00:00');
-INSERT INTO registers (user_id, entry_id, subject_id, initial_value, book_value, expired_in) VALUES
-    (1, 1, 1201, 10000, 10000, 10),
-    (1, 1, 1202, 6000, 6000, 5),
-    (1, 1, 2201, -3000, -3000, 5),
-    (1, 1, 2202, -4000, -4000, 5),
-    (1, 1, 1103, 50, 50, null),
-    (1, 1, 2102, -110, -110, null);
+INSERT INTO entries (user_id, timestamp) VALUES
+    (1, '2023/07/01 23:00:00'),
+    (1, '2023/07/02 23:00:00'),
+    (1, '2023/07/03 23:00:00'),
+    (1, '2023/07/04 23:00:00'),
+    (1, '2023/07/05 23:00:00'),
+    (1, '2023/07/06 23:00:00'),
+    (1, '2023/07/07 23:00:00');
+
+INSERT INTO registers (user_id, entry_id, subject_id, initial_value, book_value, expired_in, timestamp) VALUES
+    (1, 4, 1103, 50, 50, null, '2023/07/04 23:00:00'),
+    (1, 5, 2102, -110, -110, null, '2023/07/05 23:00:00'),
+    (1, 6, 1201, 10000, 10000, 10, '2023/07/06 23:00:00'),
+    (1, 7, 2201, -6000, -6000, 5, '2023/07/07 23:00:00');
+    
+
+INSERT INTO entryDetails (entry_id, subject_id, amount, register_id) VALUES
+    (1, 5101, 100, null),
+    (1, 1101, -100, null),
+    (2, 5102, 200, null),
+    (2, 1101, -200, null),
+    (3, 1101, 1000, null),
+    (3, 4101, -1000, null),
+    (4, 1103, 50, 1),
+    (4, 1101, -50, null),
+    (5, 1101, 110, null),
+    (5, 2102, -110, 2),
+    (6, 1201, 10000, 3),
+    (6, 1101, -10000, null),
+    (7, 1101, 6000, null),
+    (7, 2201, -6000, 4);
+
+    
+
+
+
