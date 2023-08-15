@@ -55,15 +55,15 @@ async function register(client, user_id, entry_id, detail, timestamp){
 
 async function getRegisters(user_id, type){
     let condition;
-    if (type==='assets') condition = 'id > 1200 AND id < 1300'
-    else if (type==='liabilities') condition = 'id > 2200 AND id < 2300'
-    else if (type==='ar') condition = 'id = 1103'
-    else if (type==='ar') condition = 'id = 1104'
+    if (type==='assets') condition = 'subject_id > 1200 AND subject_id < 1300'
+    else if (type==='liabilities') condition = 'subject_id > 2200 AND subject_id < 2300'
+    else if (type==='ar') condition = 'subject_id = 1103'
+    else if (type==='ap') condition = 'subject_id = 1104'
     else throw 'invalid query'
 
     const toSelect = `
         r.id, r.timestamp, r.initial_value, r.book_value, r.expired_in, r.is_expired, r.entry_id,
-        JSON_OBJECT(id, s.id, name, s.name, is_debit, s.is_debit) AS subject
+        JSON_OBJECT('id', s.id, 'name', s.name, 'is_debit', s.is_debit) AS subject
     `
 
     client = new SqlClient();
@@ -71,9 +71,9 @@ async function getRegisters(user_id, type){
 
     try{
         await client.transaction();
-        const [registers] = client
+        const [registers] = await client
             .select('registers')
-            .where({'user_id=?': user_id, condition: null, 'is_expired=?': false})
+            .where({'user_id=?': user_id, [condition]: null, 'is_expired=?': false})
             .as('r')
             .select('r', toSelect)
             .join('subjects as s', 'r.subject_id=s.id')

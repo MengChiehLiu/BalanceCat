@@ -6,7 +6,7 @@ const {checkAuthorization} = require('../../utils/checkRequest');
 // import models
 const {getRegisters} = require('../../models/registers');
 
-async function routerGet(res, user_id){
+async function routerGet(res, user_id, type){
     try{
         const registers = await getRegisters(user_id, type);
         if (registers) return res.json({data: {registers: registers}});

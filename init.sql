@@ -11,8 +11,6 @@ CREATE TABLE users(
     picture VARCHAR(255)
 );
 
-INSERT INTO users (name, email, password) VALUES ('Jack', 'test@gmail.com', 'test');
-
 -- 會計科目
 CREATE TABLE subjects(
     id INT PRIMARY KEY,
@@ -40,7 +38,7 @@ CREATE TABLE registers(
     book_value INT NOT NULL,
     expired_in INT,
     is_expired BOOLEAN DEFAULT false,
-    date DATE NOT NULL,
+    timestamp DATETIME NOT NULL,
     FOREIGN KEY (entry_id) REFERENCES entries(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE
@@ -161,3 +159,15 @@ INSERT INTO subjects (id, name, is_debit, parent_id) VALUES
 (5206, "娛樂支出", 1, 5200),
 (5207, "孝親費", 1, 5200),
 (5208, "其他", 1, 5200);
+
+
+-- mock data
+INSERT INTO users (name, email, password) VALUES ('Jack', 'test@gmail.com', 'test');
+INSERT INTO entries (user_id, timestamp) VALUES (1, '2023/07/01 23:00:00');
+INSERT INTO registers (user_id, entry_id, subject_id, initial_value, book_value, expired_in) VALUES
+    (1, 1, 1201, 10000, 10000, 10),
+    (1, 1, 1202, 6000, 6000, 5),
+    (1, 1, 2201, -3000, -3000, 5),
+    (1, 1, 2202, -4000, -4000, 5),
+    (1, 1, 1103, 50, 50, null),
+    (1, 1, 2102, -110, -110, null);
