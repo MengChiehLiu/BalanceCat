@@ -17,7 +17,7 @@ INSERT INTO users (name, email, password) VALUES ('Jack', 'test@gmail.com', 'tes
 CREATE TABLE subjects(
     id INT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    is_debit TINYINT NOT NULL,
+    is_debit BOOLEAN NOT NULL,
     parent_id INT,
     FOREIGN KEY (parent_id) REFERENCES subjects(id) ON DELETE CASCADE
 );
@@ -39,7 +39,8 @@ CREATE TABLE registers(
     initial_value INT NOT NULL,
     book_value INT NOT NULL,
     expired_in INT,
-    is_expired TINYINT DEFAULT 0,
+    is_expired BOOLEAN DEFAULT false,
+    date DATE NOT NULL,
     FOREIGN KEY (entry_id) REFERENCES entries(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE
@@ -97,7 +98,8 @@ INSERT INTO subjects (id, name, is_debit, parent_id) VALUES
 (1100, "流動資產", 1, 1000),
 (1101, "現金", 1, 1100),
 (1102, "股票", 1, 1100),
-(1103, "其他", 1, 1100),
+(1103, "應收帳款", 1, 1100),
+(1104, "其他", 1, 1100),
 
 (1200, "非流動資產", 1, 1000),
 (1201, "車子", 1, 1200),

@@ -1,7 +1,7 @@
 const SqlClient = require('../utils/ORM');
 const {register, writeOff} = require('../models/registers')
 
-async function entriesRecord(user_id, details, timestamp){
+async function postAEntry(user_id, details, timestamp){
     client = new SqlClient();
     await client.connect();
 
@@ -26,7 +26,7 @@ async function entriesRecord(user_id, details, timestamp){
             if (detail.register) {
                 register_id = detail.register.id;
                 if (register_id) await writeOff(client, user_id, register_id, detail.amount);
-                else register_id = await register(client, user_id, entry_id, detail);
+                else register_id = await register(client, user_id, entry_id, detail, timestamp);
             }
             
             values.push([entry_id, detail.subject_id, register_id, detail.amount, detail.description]);
@@ -52,5 +52,5 @@ async function entriesRecord(user_id, details, timestamp){
 
 
 module.exports = {
-    entriesRecord: entriesRecord
+    postAEntry: postAEntry
 }

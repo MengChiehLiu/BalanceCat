@@ -5,11 +5,11 @@ const {checkContentType, checkAuthorization, checkBody} = require('../../utils/c
 const toCheck = ['details', 'timestamp'];
 
 // import models
-const {entriesRecord} = require('../../models/entries');
+const {postAEntry} = require('../../models/entries');
 
 async function routerPost(res, user_id, details, description, timestamp){
     try{
-        const entry_id = await entriesRecord(user_id, details, description, timestamp);
+        const entry_id = await postAEntry(user_id, details, description, timestamp);
         if (entry_id) return res.json({data: {entry: {id: entry_id}}});
         return res.status(400).json({error: 'Invalid Entry'});
 

@@ -1,45 +1,43 @@
 const SqlClient = require('../utils/ORM');
 
-
-async function deregister(client, register_id){
-    try{
-        const [result] = await client
-            .update('registers', {'is_expired=?': 1})
-            .where({'register_id=?': register_id})
-            .query()
-        
-        return result.affectedRows === 1; 
-    }catch{
-        return false;
-    }finally{
-        client.clear();
-    }
-}
-
+// support function
 
 async function writeOff(client, user_id, register_id, amount){
     try{
-        const [result] = await client
-            .update('registers', {'book_value=book_value-?': amount})
-            .where({'user_id=?': user_id, 'register_id=?': register_id})
+        // chack validility 
+        let [book_value] = await client
+        .select('registers', 'subject_id, book_value')
+        .where({'id=?': register_id, 'user_id=?': user_id, 'expired_in': null, 'is_expired=?': 0})
+        .query()
+        
+        book_value = book_value[0].book_value
+        const is_debit = book_value > 0
+        book_value += amount
+        if ((is_debit && book_value<0) || ((!is_debit) && book_value>0)) throw 'balance illegal'
+        client.clear()
+
+        // write off
+        await client
+            .update('registers', {'book_value=?': book_value, 'is_expired=?': book_value===0})
+            .where({'id=?': register_id})
             .query()
         
-        return result.affectedRows === 1;    
-    }catch{
-        throw `register_id_${register_id}: write off fail`
+    }catch(err){
+        console.log(err);
+        throw `register_id_${register_id}: write off fail`;
     }finally{
         client.clear();
     }
 }
 
-
-async function register(client, user_id, entry_id, detail){
+async function register(client, user_id, entry_id, detail, timestamp){
     try{
         const [result] = await client
             .insert('registers', {
                 user_id: user_id,
                 entry_id: entry_id,
                 subject_id: detail.subject_id,
+                timestamp: timestamp,
                 initial_value: detail.amount,
                 book_value: detail.amount,
                 expired_in: detail.register.expired_in
@@ -53,8 +51,48 @@ async function register(client, user_id, entry_id, detail){
     }
 }
 
+// router function
+
+async function getRegisters(user_id, type){
+    let condition;
+    if (type==='assets') condition = 'id > 1200 AND id < 1300'
+    else if (type==='liabilities') condition = 'id > 2200 AND id < 2300'
+    else if (type==='ar') condition = 'id = 1103'
+    else if (type==='ar') condition = 'id = 1104'
+    else throw 'invalid query'
+
+    const toSelect = `
+        r.id, r.timestamp, r.initial_value, r.book_value, r.expired_in, r.is_expired, r.entry_id,
+        JSON_OBJECT(id, s.id, name, s.name, is_debit, s.is_debit) AS subject
+    `
+
+    client = new SqlClient();
+    await client.connect();
+
+    try{
+        await client.transaction();
+        const [registers] = client
+            .select('registers')
+            .where({'user_id=?': user_id, condition: null, 'is_expired=?': false})
+            .as('r')
+            .select('r', toSelect)
+            .join('subjects as s', 'r.subject_id=s.id')
+            .query()
+        
+        await client.commit();
+        return registers;
+    }catch(err){
+        console.log(err);
+        await client.rollback();
+        return null;
+    }finally{
+        client.close();
+    }
+}
+
+
 module.exports = {
     register: register,
     writeOff: writeOff,
-    deregister: deregister
+    getRegisters: getRegisters
 }
