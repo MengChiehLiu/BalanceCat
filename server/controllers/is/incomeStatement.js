@@ -8,7 +8,7 @@ const {checkContentType, checkAuthorization, checkBody, checkTimestampFormat} = 
 const {getIncomeStatementData} = require('../../models/incomeStatement');
 
 router.get('/', checkContentType(), checkAuthorization, checkTimestampFormat, async(req, res) => {
-    //const userId = req.user._id;  // 這部分是假設你已經使用了某種方式來取得用戶ID，例如JWT
+    //const userId = req.user._id; 
     const userId = 1
     const timestamp = req.query.timestamp;
 
