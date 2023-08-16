@@ -49,8 +49,56 @@ async function postAEntry(user_id, details, timestamp){
     };
 }
 
+async function getEntryHistory(user_id, subject_id, start, end){
+    const client = new SqlClient();
+    await client.connect();
 
+    const toSelect = `
+        e.id, e.timestamp, JSON_ARRAYAGG(
+            JSON_OBJECT(
+                "subject", JSON_OBJECT(
+                    "id", s.id,
+                    "name", s.name,
+                    "is_debit", s.is_debit
+                ), 
+                "register_id", ed.register_id,
+                "amount", ed.amount,
+                "description", ed.description)  
+          ) AS details
+    `
+  
+    try{
+        await client.transaction();
+        
+        client
+            .select('entries')
+            .where({'user_id=?': user_id, 'timestamp>=?': start, 'timestamp<=?': end})
+            .as('e')
+  
+            .select('e', toSelect)
+            .join('entryDetails as ed', 'e.id=ed.entry_id')
+            .join('subjects as s', 's.id=ed.subject_id')
+            .group('id')
+            .order('timestamp DESC, amount')
+        
+        if (subject_id) client.where({'s.subject_id=?': subject_id})
+            
+        const [entryHistory] = await client.query()
+  
+        await client.commit();
+        return entryHistory;
+
+    }catch(err){
+        console.log(err);
+        await client.rollback();
+        return null;
+
+    }finally{
+        client.close();
+    }
+}
 
 module.exports = {
-    postAEntry: postAEntry
+    postAEntry: postAEntry,
+    getEntryHistory: getEntryHistory
 }

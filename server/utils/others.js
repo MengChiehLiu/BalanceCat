@@ -1,13 +1,12 @@
 function firstDateOfCurrentMonth() {
-    const currentDate = new Date();
-    const firstDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-    return firstDate;
+    const today = new Date();
+    return new Date(today.getFullYear(), today.getMonth(), 1);
 }
 
 function lastDateOfPreviousMonth() {
-    const currentDate = new Date();
-    const lastDateOfPreviousMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0);
-    return lastDateOfPreviousMonth;
+    const today = new Date();
+    const lastDate = new Date(today.getFullYear(), today.getMonth(), 0);
+    return `${lastDate.getFullYear()}${lastDate.getMonth}${lastDate.getDay}`;
 }
 
 function buildHierarchy(items, parentId) {
