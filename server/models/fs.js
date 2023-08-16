@@ -1,8 +1,8 @@
 const SqlClient = require('../utils/ORM');
-const {firstDateOfCurrentMonth, lastDateOfPreviousMonth, buildHierarchy} = require('../utils/others')
+const {buildHierarchy} = require('../utils/others')
 
 
-async function getHistoryFS(user_id, dateString){
+async function getHistoryFS(user_id, month){
     const client = new SqlClient();
     await client.connect();
 
@@ -14,12 +14,12 @@ async function getHistoryFS(user_id, dateString){
         const [historyFS] = await client
             // last month
             .select('balances')
-            .where({'user_id=?': user_id, 'date=?': dateString})
+            .where({'user_id=?': user_id, 'month=?': month})
             .as('b')
             
             .select('b', toSelect)
             .join('subjects as s', 's.id=b.subject_id')
-            .where({'s.id<?': 4000})
+            .where({'s.id<?': 3000})
             .order('id')
             .query()
 
@@ -45,8 +45,11 @@ async function getCurrentFS(user_id){
         CAST(COALESCE(SUM(ed.amount), 0) + COALESCE(b.amount, 0) AS SIGNED) AS amount
     `
 
-    const thisMonth = firstDateOfCurrentMonth();
-    const lastMonth = lastDateOfPreviousMonth();
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth() + 1;
+    console.log(month)
+    const lastMonth = (month===1) ? `${year-1}-12` : `${year}-${month-1}`
 
     
     try{
@@ -55,7 +58,7 @@ async function getCurrentFS(user_id){
         const [currentFS] = await client
             // last month
             .select('balances')
-            .where({'user_id=?': user_id, 'date=?': lastMonth})
+            .where({'user_id=?': user_id, 'month=?': lastMonth})
             ._as('b').push()
 
             .select('subjects')
@@ -64,7 +67,7 @@ async function getCurrentFS(user_id){
 
             // this month
             .select('entries')
-            .where({'user_id=?': user_id, 'timestamp>=?': thisMonth})
+            .where({'user_id=?': user_id, 'YEAR(timestamp)=?': year, 'MONTH(timestamp)=?': month})
             .as('e').shift().shift()
 
             .select('e', toSelect)

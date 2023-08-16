@@ -63,7 +63,7 @@ CREATE TABLE balances(
     user_id INT NOT NULL,
     subject_id INT NOT NULL,
     amount INT NOT NULL,
-    date DATE NOT NULL,
+    month VARCHAR(10) NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE
 );
@@ -169,8 +169,8 @@ INSERT INTO entries (user_id, timestamp) VALUES
     (1, '2023/07/03 23:00:00'),
     (1, '2023/07/04 23:00:00'),
     (1, '2023/07/05 23:00:00'),
-    (1, '2023/07/06 23:00:00'),
-    (1, '2023/07/07 23:00:00');
+    (1, '2023/08/06 23:00:00'),
+    (1, '2023/08/07 23:00:00');
 
 INSERT INTO registers (user_id, entry_id, subject_id, initial_value, book_value, expired_in, timestamp) VALUES
     (1, 4, 1103, 50, 50, null, '2023/07/04 23:00:00'),
@@ -194,6 +194,14 @@ INSERT INTO entryDetails (entry_id, subject_id, amount, register_id) VALUES
     (6, 1101, -10000, null),
     (7, 1101, 6000, null),
     (7, 2201, -6000, 4);
+
+INSERT INTO balances (user_id, subject_id, amount, month) VALUES
+    (1, 1101, 1000, '2023-03'),
+    (1, 1101, 1200, '2023-04'),
+    (1, 1101, 1500, '2023-05'),
+    (1, 1101, 2000, '2023-06'),
+    (1, 1101, 1800, '2023-07'),
+    (1, 1101, 2500, '2023-08');
 
     
 
