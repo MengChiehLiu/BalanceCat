@@ -134,8 +134,17 @@ class SqlClient{
     order(column){
         this._query += `ORDER BY ${column} `;
         return this;
-    }
+    };
 
+    group(column){
+        this._query += `GROUP BY ${column} `;
+        return this;
+    };
+
+    union(){
+        this._query += `UNION `;
+        return this;
+    };
 
     async query(){
         return await this.client.query(this._query, this.values)
