@@ -19,6 +19,9 @@ router.use('/api/1.0/is', require('./incomeStatement.js'));
 // goals
 router.use('/api/1.0/goals', require('./goals.js'));
 
+// users
+router.use('/api/1.0/users', require('./users.js'));
+
 
 
 
