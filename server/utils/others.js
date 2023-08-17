@@ -22,7 +22,5 @@ function buildHierarchy(items, parentId) {
 }
 
 module.exports = {
-    firstDateOfCurrentMonth: firstDateOfCurrentMonth,
-    lastDateOfPreviousMonth: lastDateOfPreviousMonth,
     buildHierarchy: buildHierarchy
 }

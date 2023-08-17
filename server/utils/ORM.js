@@ -146,8 +146,14 @@ class SqlClient{
         return this;
     };
 
-    async query(){
-        return await this.client.query(this._query, this.values)
+    next_line(){
+        this._query += `; `;
+        return this;
+    }
+
+    async query(query, values){
+        if (query && values) return await this.client.query(query, values)
+        else return await this.client.query(this._query, this.values)
     };
 };
 

@@ -48,7 +48,6 @@ async function getCurrentFS(user_id){
     const today = new Date();
     const year = today.getFullYear();
     const month = today.getMonth() + 1;
-    console.log(month)
     const lastMonth = (month===1) ? `${year-1}-12` : `${year}-${month-1}`
 
     
@@ -77,8 +76,9 @@ async function getCurrentFS(user_id){
             .group('s.id')
             .query()
 
-        await client.commit();
         const [hierarchyFS, total] = buildHierarchy(currentFS, null);
+        await client.commit();
+        
         return hierarchyFS;
     }catch(err){
         console.log(err);

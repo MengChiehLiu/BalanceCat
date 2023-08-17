@@ -2,50 +2,37 @@ const SqlClient = require('../utils/ORM');
 
 // support function
 
-async function writeOff(client, user_id, register_id, amount){
-    try{
-        // chack validility 
-        let [book_value] = await client
-        .select('registers', 'subject_id, book_value')
-        .where({'id=?': register_id, 'user_id=?': user_id, 'expired_in': null, 'is_expired=?': 0})
-        .query()
-        
-        book_value = book_value[0].book_value
-        const is_debit = book_value > 0
-        book_value += amount
-        if ((is_debit && book_value<0) || ((!is_debit) && book_value>0)) throw 'balance illegal'
-        client.clear()
+async function register(client, user_id, entry_id, timestamp, details){
+    // console.log('start register')
 
-        // write off
-        await client
-            .update('registers', {'book_value=?': book_value, 'is_expired=?': book_value===0})
-            .where({'id=?': register_id})
-            .query()
-        
+    try{
+        let query = ''
+        let values = []
+
+        for (let detail of details){
+            if (!detail.register) continue // no operation needed
+            if (!detail.register.id){ // not register yet
+                query += `INSERT INTO registers (user_id, entry_id, subject_id, timestamp, initial_value, book_value, expired_in) VALUES (?);`
+                values.push([user_id, entry_id, detail.subject_id, timestamp, detail.amount, detail.amount, detail.register.expired_in])
+            }else{
+                const book_value = detail.register.book_value
+                const new_book_value = book_value + amount
+                if (book_value*new_book_value < 0) throw 'Invalid write off operation'
+
+                query += `UPDATE registers SET book_value=?, is_expired=? WHERE id=?;`
+                values.push(new_book_value)
+                values.push(new_book_value===0)
+                values.push(detail.register.id)
+            };
+        };
+
+        if (query) await client.query(query, values);
+
+        // console.log('finish register')
+        return;
     }catch(err){
-        console.log(err);
-        throw `register_id_${register_id}: write off fail`;
-    }finally{
-        client.clear();
-    }
-}
-
-async function register(client, user_id, entry_id, detail, timestamp){
-    try{
-        const [result] = await client
-            .insert('registers', {
-                user_id: user_id,
-                entry_id: entry_id,
-                subject_id: detail.subject_id,
-                timestamp: timestamp,
-                initial_value: detail.amount,
-                book_value: detail.amount,
-                expired_in: detail.register.expired_in
-            })
-            .query()
-        return result.insertId;    
-    }catch{
-        throw `entry_id_${entry_id}: register fail`
+        console.log(err)
+        throw `register fail`
     }finally{
         client.clear();
     }
@@ -93,6 +80,5 @@ async function getRegisters(user_id, type){
 
 module.exports = {
     register: register,
-    writeOff: writeOff,
     getRegisters: getRegisters
 }
