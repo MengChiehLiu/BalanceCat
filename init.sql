@@ -8,7 +8,7 @@ CREATE TABLE users(
     name VARCHAR(255) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    picture VARCHAR(255)
+    last_updated DATE NOT NULL
 );
 
 -- 會計科目
@@ -25,6 +25,9 @@ CREATE TABLE entries(
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     timestamp DATETIME NOT NULL,
+    parent_id INT,
+    is_adjusted BOOLEAN DEFAULT false,
+    FOREIGN KEY (parent_id) REFERENCES entries(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -49,21 +52,19 @@ CREATE TABLE entryDetails(
     id INT AUTO_INCREMENT PRIMARY KEY,
     entry_id INT NOT NULL,
     subject_id INT NOT NULL,
-    register_id INT,
     amount INT NOT NULL,
     description VARCHAR(255),
     FOREIGN KEY (entry_id) REFERENCES entries(id) ON DELETE CASCADE,
-    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE,
-    FOREIGN KEY (register_id) REFERENCES registers(id) ON DELETE CASCADE
+    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE
 );
 
 -- 科目餘額
 CREATE TABLE balances(
-    id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     subject_id INT NOT NULL,
     amount INT NOT NULL,
-    date DATE NOT NULL,
+    month DATE NOT NULL,
+    PRIMARY KEY (user_id, subject_id, month),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE
 );
@@ -162,15 +163,15 @@ INSERT INTO subjects (id, name, is_debit, parent_id) VALUES
 
 
 -- mock data
-INSERT INTO users (name, email, password) VALUES ('Jack', 'test@gmail.com', 'test');
+INSERT INTO users (name, email, password, last_updated) VALUES ('Jack', 'test@gmail.com', 'test', '2023-03-01');
 INSERT INTO entries (user_id, timestamp) VALUES
     (1, '2023/07/01 23:00:00'),
     (1, '2023/07/02 23:00:00'),
     (1, '2023/07/03 23:00:00'),
     (1, '2023/07/04 23:00:00'),
     (1, '2023/07/05 23:00:00'),
-    (1, '2023/07/06 23:00:00'),
-    (1, '2023/07/07 23:00:00');
+    (1, '2023/08/06 23:00:00'),
+    (1, '2023/08/07 23:00:00');
 
 INSERT INTO registers (user_id, entry_id, subject_id, initial_value, book_value, expired_in, timestamp) VALUES
     (1, 4, 1103, 50, 50, null, '2023/07/04 23:00:00'),
@@ -179,22 +180,46 @@ INSERT INTO registers (user_id, entry_id, subject_id, initial_value, book_value,
     (1, 7, 2201, -6000, -6000, 5, '2023/07/07 23:00:00');
     
 
-INSERT INTO entryDetails (entry_id, subject_id, amount, register_id) VALUES
-    (1, 5101, 100, null),
-    (1, 1101, -100, null),
-    (2, 5102, 200, null),
-    (2, 1101, -200, null),
-    (3, 1101, 1000, null),
-    (3, 4101, -1000, null),
-    (4, 1103, 50, 1),
-    (4, 1101, -50, null),
-    (5, 1101, 110, null),
-    (5, 2102, -110, 2),
-    (6, 1201, 10000, 3),
-    (6, 1101, -10000, null),
-    (7, 1101, 6000, null),
-    (7, 2201, -6000, 4);
+INSERT INTO entryDetails (entry_id, subject_id, amount) VALUES
+    (1, 5101, 100),
+    (1, 1101, -100),
+    (2, 5102, 200),
+    (2, 1101, -200),
+    (3, 1101, 1000),
+    (3, 4101, -1000),
+    (4, 1103, 50),
+    (4, 1101, -50),
+    (5, 1101, 110),
+    (5, 2102, -110),
+    (6, 1201, 10000),
+    (6, 1101, -10000),
+    (7, 1101, 6000),
+    (7, 2201, -6000);
 
+INSERT INTO balances (user_id, subject_id, amount, month) VALUES
+    (1, 1000, 0, '2023-03-01'),
+    (1, 1100, 0, '2023-03-01'),
+    (1, 1101, 0, '2023-03-01'),
+    (1, 1102, 0, '2023-03-01'),
+    (1, 1103, 0, '2023-03-01'),
+    (1, 1104, 0, '2023-03-01'),
+    (1, 1200, 0, '2023-03-01'),
+    (1, 1201, 0, '2023-03-01'),
+    (1, 1202, 0, '2023-03-01'),
+    (1, 1203, 0, '2023-03-01'),
+    (1, 1204, 0, '2023-03-01'),
+    (1, 1205, 0, '2023-03-01'),
+    (1, 1206, 0, '2023-03-01'),
+    (1, 2000, 0, '2023-03-01'),
+    (1, 2100, 0, '2023-03-01'),
+    (1, 2101, 0, '2023-03-01'),
+    (1, 2102, 0, '2023-03-01'),
+    (1, 2103, 0, '2023-03-01'),
+    (1, 2200, 0, '2023-03-01'),
+    (1, 2201, 0, '2023-03-01'),
+    (1, 2202, 0, '2023-03-01'),
+    (1, 2203, 0, '2023-03-01'),
+    (1, 2204, 0, '2023-03-01');
     
 
 

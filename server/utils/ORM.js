@@ -134,11 +134,26 @@ class SqlClient{
     order(column){
         this._query += `ORDER BY ${column} `;
         return this;
+    };
+
+    group(column){
+        this._query += `GROUP BY ${column} `;
+        return this;
+    };
+
+    union(){
+        this._query += `UNION `;
+        return this;
+    };
+
+    next_line(){
+        this._query += `; `;
+        return this;
     }
 
-
-    async query(){
-        return await this.client.query(this._query, this.values)
+    async query(query, values){
+        if (query && values) return await this.client.query(query, values)
+        else return await this.client.query(this._query, this.values)
     };
 };
 
