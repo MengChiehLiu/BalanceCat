@@ -1,7 +1,21 @@
+
 const { pool } = require('../utils/ORM');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
+
+// user's latest update time
+async function lastUpdate(client, user_id, timestamp){
+    try{
+        const query = `UPDATE users SET last_updated=GREATEST(?, last_updated) WHERE id=?`
+        const values = [timestamp, user_id]
+        await client.query(query, values)
+    }catch(err){
+        console.log(err)
+        throw 'lastUpdate fail'
+    }
+}
+
 
 // 密鑰
 const secretKey = process.env.secretKey; 
@@ -205,4 +219,10 @@ async function signInUsers(email, password) {
     return responseData;
 }
 
-module.exports = { signUpUsers, signInUsers }
+module.exports = { 
+  signUpUsers: signUpUsers,
+  signInUsers: signInUsers,
+  lastUpdate: lastUpdate 
+}
+
+
