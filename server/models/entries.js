@@ -1,6 +1,7 @@
-const SqlClient = require('../utils/ORM');
+const {SqlClient} = require('../utils/ORM');
 const {register} = require('../models/registers')
 const {updateBalance} = require('../models/balances')
+const {lastUpdate} = require('../models/users')
 
 
 // helper function
@@ -22,7 +23,7 @@ async function insertEntryDetails(client, entry_id, details){
     }
 }
 
-
+// route function
 async function postAEntry(user_id, details, timestamp, parent_id){
     client = new SqlClient();
     await client.connect();
@@ -36,14 +37,15 @@ async function postAEntry(user_id, details, timestamp, parent_id){
             .query()
 
         const entry_id = result.insertId;
-        // console.log('here')
+
         // insert entry details & update balance & register
         await Promise.all([
             insertEntryDetails(client, entry_id, details),
             updateBalance(client, user_id, timestamp, details),
-            register(client, user_id, entry_id, timestamp, details)
+            register(client, user_id, entry_id, timestamp, details),
+            lastUpdate(client, user_id, timestamp)
         ]);
-        // console.log('there')
+
         await client.commit();
         return entry_id;
     }catch(err){
@@ -68,7 +70,6 @@ async function getEntryHistory(user_id, subject_id, start, end){
                     "name", s.name,
                     "is_debit", s.is_debit
                 ), 
-                "register_id", ed.register_id,
                 "amount", ed.amount,
                 "description", ed.description)  
           ) AS details

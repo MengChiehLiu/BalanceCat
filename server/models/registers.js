@@ -1,4 +1,4 @@
-const SqlClient = require('../utils/ORM');
+const {SqlClient} = require('../utils/ORM');
 
 // support function
 

@@ -157,5 +157,8 @@ class SqlClient{
     };
 };
 
-module.exports = {SqlClient, pool};
+module.exports = {
+    SqlClient: SqlClient, 
+    pool: pool
+};
 
