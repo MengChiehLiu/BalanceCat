@@ -7,7 +7,7 @@ const {checkContentType, checkAuthorization, checkBody, checkTimestampFormat} = 
 // import models
 const {getIncomeStatementData} = require('../../models/incomeStatement');
 
-router.get('/', checkContentType(), checkAuthorization, checkTimestampFormat, async(req, res) => {
+router.get('/', checkTimestampFormat, async(req, res) => {
     //const userId = req.user._id; 
     const userId = 1
     const timestamp = req.query.timestamp;
