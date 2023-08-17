@@ -24,6 +24,50 @@ async function insertEntryDetails(client, entry_id, details){
 }
 
 // route function
+async function getAEntry(user_id, entry_id){
+    client = new SqlClient();
+    await client.connect();
+
+    const toSelect = `
+        e.id, DATE_FORMAT(e.timestamp, '%Y-%m-%d %H:%i:%s') AS timestamp, 
+        JSON_ARRAYAGG(
+            JSON_OBJECT(
+                "subject", JSON_OBJECT(
+                    "id", s.id,
+                    "name", s.name,
+                    "is_debit", s.is_debit
+                ),
+                "amount", ed.amount,
+                "description", ed.description
+            )
+        ) AS details
+            `
+
+    try{
+        const [entry] = await client
+            .select('entries', 'id, timestamp')
+            .where({'user_id=?': user_id, 'id=?': entry_id})
+            .as('e')
+
+            .select('e', toSelect)
+            .join('entryDetails as ed', 'e.id=ed.entry_id')
+            .join('subjects as s', 's.id=ed.subject_id')
+            .query()
+
+        if (entry.length === 0) throw "invalid entry_id or user_id"
+        return entry[0];
+
+    }catch(err){
+        console.log(err)
+        return null;
+
+    }finally{
+        client.close();
+    }
+}
+
+
+
 async function postAEntry(user_id, details, timestamp, parent_id){
     client = new SqlClient();
     await client.connect();
@@ -63,7 +107,8 @@ async function getEntryHistory(user_id, subject_id, start, end){
     await client.connect();
 
     const toSelect = `
-        e.id, e.timestamp, JSON_ARRAYAGG(
+        e.id, DATE_FORMAT(e.timestamp, '%Y-%m-%d %H:%i:%s') AS timestamp, 
+        JSON_ARRAYAGG(
             JSON_OBJECT(
                 "subject", JSON_OBJECT(
                     "id", s.id,
@@ -107,6 +152,7 @@ async function getEntryHistory(user_id, subject_id, start, end){
 }
 
 module.exports = {
+    getAEntry: getAEntry,
     postAEntry: postAEntry,
     getEntryHistory: getEntryHistory
 }
