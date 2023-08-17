@@ -1,4 +1,5 @@
 const Redis = require("ioredis");
+require('dotenv').config();
 const client = new Redis(6379, process.env.REDIS_HOST)
 
 async function rateLimiter(req, res, next) {

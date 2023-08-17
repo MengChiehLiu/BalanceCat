@@ -1,0 +1,67 @@
+version: "3.9"
+services:
+
+  nginx:
+    container_name: balanceCat_nginx
+    image: nginx:mainline-alpine-slim
+    restart: always
+    volumes:
+      - balanceCat_nginx_volume:/etc/nginx
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./private/combined.crt:/etc/nginx/combined.crt
+      - ./private/private.key:/etc/nginx/private.key
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - balanceCat_network
+    depends_on:
+      - server
+
+  server:
+    container_name: balanceCat_server
+    build: 
+      context: .          
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - balanceCat_server_volume:/shared_data/server
+    ports:
+      - "3000:3000"
+    networks:
+      - balanceCat_network
+    depends_on:
+      - mysql
+      - redis
+
+  mysql:
+    container_name: balanceCat_mysql
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_PASSWORD}"
+    volumes:
+      - balanceCat_mysql_volume:/var/lib/mysql
+    networks:
+      - balanceCat_network
+
+  redis:
+    container_name: balanceCat_redis
+    image: redis:alpine
+    restart: always
+    volumes:
+      - balanceCat_redis_volume:/data
+    networks:
+      - balanceCat_network
+
+
+networks:
+  balanceCat_network:
+    driver: bridge
+
+volumes:
+  balanceCat_nginx_volume:
+  balanceCat_server_volume:
+  balanceCat_mysql_volume:
+  balanceCat_redis_volume:
+  
