@@ -5,11 +5,11 @@ const {checkAuthorization} = require('../../utils/checkRequest');
 
 
 // import models
-const {getHistoryFS, getCurrentFS} = require('../../models/fs');
+const {getFS} = require('../../models/fs');
 
 async function routerGet(res, user_id, month){
     try{
-        const fs = month ? await getHistoryFS(user_id, month) : await getCurrentFS(user_id)
+        const fs = await getFS(user_id, month)
         if (fs) return res.json({data: {subjects: fs}});
         return res.status(400).json({error: 'Invalid Entry'});
 
