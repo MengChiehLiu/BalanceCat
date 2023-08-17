@@ -80,8 +80,9 @@ async function goalGet (req, res) {
     try {
         const user_id = 1;  // const userId = req.user._id; 
         const inputDate = new Date();
+        const duration = req.body.duration
     
-        const data = await getGoal(user_id, inputDate);
+        const data = await getGoal(user_id, inputDate, duration);
         return res.status(200).json(data);
 
     } catch (err) {

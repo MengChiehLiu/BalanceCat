@@ -124,12 +124,7 @@ async function searchBalance(connection, user_id, subject_id, startMonth, curren
     return await connection.query(query, [user_id, subject_id, startMonth, currentMonth]);
 }
 
-function getMonthName(date) {
-    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    return monthNames[date.getMonth()];
-}
-
-async function getGoal (user_id, inputDate) {
+async function getGoal (user_id, inputDate, duration) {
     // Database
     let connection;
     try{
@@ -150,18 +145,28 @@ async function getGoal (user_id, inputDate) {
         `;
         const goalsResults = await connection.query(goalsQuery, [user_id]);
         console.log("goalsResults:", goalsResults);
-    
-        const startMonth = new Date(Date.UTC(inputDate.getFullYear(), inputDate.getMonth() - 6));
-        //console.log("startMonth:",startMonth)
-        const currentMonth = new Date(Date.UTC(inputDate.getFullYear(), inputDate.getMonth()));
-        //console.log("currentMonth:",currentMonth)
+        
+        // 计算时间范围
+        const startMonth = new Date(inputDate);
+        if (duration) {
+            startMonth.setUTCMonth(startMonth.getUTCMonth() - duration);
+        } else {
+            startMonth.setUTCMonth(startMonth.getUTCMonth() - 6);
+        }
+        startMonth.setUTCDate(1);
+        console.log("startMonth",startMonth)
+
+        const endMonth = new Date(inputDate);
+        endMonth.setUTCDate(1);  // 设置为每个月的第一天
+        console.log("endMonth",endMonth)     
     
         let goals = [];
     
         for (let i = 0; i < goalsResults[0].length; i++) {
             const goal = goalsResults[0][i];
-            const balanceResults = await searchBalance(connection, user_id, goal.subject_id, startMonth, currentMonth);
-            const currentMonthString = currentMonth.toISOString().slice(0, 7);  // 例如："2023-08"
+            const balanceResults = await searchBalance(connection, user_id, goal.subject_id, startMonth, endMonth);
+            const currentMonthString = endMonth.toISOString().slice(0, 7);  // 例如："2023-08"
+            console.log("currentMonthString",currentMonthString)
             const balanceData = balanceResults[0];
             
             // 找到當前月份的資料以獲取當前餘額
@@ -177,9 +182,8 @@ async function getGoal (user_id, inputDate) {
                 amount: goal.amount,
                 current_amount: currentBalance.amount, // 使用找到的當前餘額
                 history_amount: historyData.map(b => {
-                    const dateObj = new Date(b.month + "-01");
                     return {
-                        month: getMonthName(dateObj),
+                        month: b.month.toISOString().slice(0, 7),
                         amount: b.amount
                     }
                 })

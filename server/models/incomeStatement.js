@@ -1,5 +1,7 @@
 const { pool } = require('../utils/ORM');
 
+const { buildHierarchyIS } = require('../utils/others');
+
 async function getIncomeStatementData(userId, inputDate) {
     let connection;
     try {
@@ -13,8 +15,8 @@ async function getIncomeStatementData(userId, inputDate) {
     const startDate = new Date(Date.UTC(inputDate.getFullYear(), inputDate.getMonth(), 1)); // 使用 Date.UTC 创建日期
     const endDate = inputDate; // endDate 就是您的 inputDate
     
-    console.log(startDate.toISOString());
-    console.log(endDate.toISOString());
+    // console.log(startDate.toISOString());
+    // console.log(endDate.toISOString());
 
     try {
         const query = `
@@ -31,20 +33,35 @@ async function getIncomeStatementData(userId, inputDate) {
                 )
                 
                 SELECT 
-                    s.id as subject_id, 
-                    s.name as name, 
-                    COALESCE(es.total_amount, 0) as amount,
-                    s.is_debit
+                    s.id AS subject_id, 
+                    s.name AS name, 
+                    COALESCE(es.total_amount, 0) AS amount,
+                    s.is_debit,
+                    s.parent_id
                 FROM subjects s
                 LEFT JOIN EntrySummary es ON s.id = es.subject_id
                 WHERE s.id >= 4000
-                ORDER BY s.id
+                ORDER BY s.id;
+            
             `;
 
         const [results] = await connection.query(query, [startDate, endDate, userId]);
-        console.log(results);
 
-        return results;
+        // Extract the relevant fields from each result item and create an array of objects
+        const subjects = results.map(result => ({
+            id: result.subject_id,
+            name: result.name,
+            amount: result.amount * (result.subject_id.toString().startsWith('4') ? -1 : 1), 
+            is_debit: result.is_debit,
+            parent_id: result.parent_id
+        }));
+        console.log("subjects",subjects)
+        
+        const hierarchy = buildHierarchyIS(subjects, null);
+        
+
+        return hierarchy;
+
     } catch (err) {
         console.error("Failed to run query:", err);
         throw err;
