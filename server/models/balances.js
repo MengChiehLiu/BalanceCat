@@ -17,7 +17,10 @@ async function updateBalance(client, user_id, timestamp, details){
         let query = ''
         let values = []
         for (let detail of details){
-            query += `UPDATE balances SET amount=amount+? WHERE user_id=? AND subject_id in (?) AND month=?;`
+            if (detail.subject_id<=3100)
+                query += `UPDATE balances SET amount=amount+? WHERE user_id=? AND subject_id in (?) AND month>=?;`
+            else
+                query += `UPDATE balances SET amount=amount+? WHERE user_id=? AND subject_id in (?) AND month=?;`
             values.push(detail.amount)
             values.push(user_id)
             values.push(getThreeIds(detail.subject_id))
