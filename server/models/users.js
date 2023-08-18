@@ -219,10 +219,32 @@ async function signInUsers(email, password) {
     return responseData;
 }
 
+// User's Picture
+async function updateUserPicture(userId, pictureUrl) {
+    let connection;
+    try {
+        connection = await pool.getConnection();
+    } catch (err) {
+        console.error("Failed to get connection:", err);
+        throw err;
+    }
+
+    try {
+      const query = 'UPDATE users SET picture = ? WHERE id = ?';
+      await connection.query(query, [pictureUrl, userId]);
+    } catch (error) {
+      console.error('Error updating user picture:', error);
+      throw error;
+    } finally {
+        await connection.release();
+    }
+}
+
 module.exports = { 
   signUpUsers: signUpUsers,
   signInUsers: signInUsers,
-  lastUpdate: lastUpdate 
+  lastUpdate: lastUpdate,
+  updateUserPicture: updateUserPicture
 }
 
 

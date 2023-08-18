@@ -1,4 +1,8 @@
 const router = require('express').Router();
+const multer = require('multer');
+const path = require('path');
+
+
 
 
 // import middlewares
@@ -7,7 +11,7 @@ const toCheck_usersSignUp = ['name','email','password']
 const toCheck_usersSignIn = ['email','password']
 
 // import models
-const { signUpUsers, signInUsers } = require('../../models/users')
+const { signUpUsers, signInUsers, updateUserPicture } = require('../../models/users')
 
 
 // Signup
@@ -59,11 +63,73 @@ async function usersSignIn(req, res) {
     }
 }
 
+// Picture
+
+// 設定檔案儲存的目錄和檔案名稱
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, 'public/images');
+    },
+    filename: function (req, file, cb) {
+      const ext = path.extname(file.originalname);
+      const fileName = `${Date.now()}${ext}`; // 檔案名稱，這裡使用時間戳記加上原始檔案的副檔名
+      cb(null, fileName);
+    }
+  });
+  
+// 建立 multer middleware
+const upload = multer({ storage: storage });
+
+
+async function usersPictureUpdate(req, res) {
+    try {
+      const userId = req.headers.authorization;
+  
+      await new Promise((resolve, reject) => {
+        // 執行圖片上傳
+        const uploadMiddleware = upload.single('picture');
+        uploadMiddleware(req, res, function (err) {
+          if (err instanceof multer.MulterError) {
+            // 檔案上傳錯誤
+            console.error('Multer Error:', err);
+            reject(err);
+          } else if (err) {
+            // 其他錯誤
+            console.error('Error:', err);
+            reject(err);
+          }
+          resolve();
+        });
+      });
+  
+      const picturePath = req.file.path.replace('public/', '');
+      const protocol = req.protocol;  // 通常是 'http' 或 'https'
+      const host = req.get('host');   // 獲取主機名，例如 '127.0.0.1:3000'
+      const serverUrl = `${protocol}://${host}`;
+      const pictureUrl = `${serverUrl}/images/${path.basename(picturePath)}`;
+  
+      await updateUserPicture(userId, pictureUrl);
+  
+      res.status(200).json({ data: { picture: pictureUrl } });
+    } catch (error) {
+      console.error('Error updating user picture:', error);
+      res.status(500).json({ error: 'Server Error' });
+    }
+  }
+
+  
+  
+  
+  
+  
+  
+
 
 
 
 
 router.post('/signup', checkContentType(),  checkBody(toCheck_usersSignUp), usersSignUp);
 router.post('/signin', checkContentType(),  checkBody(toCheck_usersSignIn), usersSignIn);
+router.put('/picture', usersPictureUpdate);
 
 module.exports = router
