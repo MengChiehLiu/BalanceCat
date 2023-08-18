@@ -49,7 +49,8 @@ async function getRegisters(user_id, type){
     else throw 'invalid query'
 
     const toSelect = `
-        r.id, r.timestamp, r.initial_value, r.book_value, r.expired_in, r.is_expired, r.entry_id,
+        r.id, r.initial_value, r.book_value, r.expired_in, r.is_expired, r.entry_id,
+        DATE_FORMAT(r.timestamp, '%Y-%m-%d %H:%i:%s') AS timestamp,
         JSON_OBJECT('id', s.id, 'name', s.name, 'is_debit', s.is_debit) AS subject
     `
 
