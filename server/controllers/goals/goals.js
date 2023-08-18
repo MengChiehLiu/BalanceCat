@@ -39,7 +39,7 @@ async function goalUpdate (req, res) {
         const id = req.params.id; // Retrieve id from URL params
         const amount = req.body.amount;
     
-        const goal_id = await updateGoal(id, amount); // Using the updateGoal function
+        const goal_id = await updateGoal(id, user_id, amount); // Using the updateGoal function
         return res.status(200).json({data:{goal:{id:goal_id}}});
 
     } catch (err) {
@@ -60,7 +60,7 @@ async function goalDelete (req, res) {
         const user_id = req.user.id;
         const id = req.params.id; // Retrieve id from URL params
     
-        const goal_id = await deleteGoal(id);
+        const goal_id = await deleteGoal(id, user_id);
         return res.status(200).json({data:{goal:{id:goal_id}}});
 
     } catch (err) {

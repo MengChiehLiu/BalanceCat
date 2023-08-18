@@ -54,7 +54,7 @@ async function setGoal(user_id, subject_id, amount){
     }
 }
 
-async function updateGoal(id, amount){
+async function updateGoal(id, user_id, amount){
     // Database
     let connection;
     try{
@@ -67,9 +67,9 @@ async function updateGoal(id, amount){
     // Update goal
     try{
         const query = `
-        UPDATE goals SET amount=? WHERE id = ?  
+        UPDATE goals SET amount=? WHERE id = ? AND user_id = ?  
         `;
-        const result = await connection.query(query, [amount, id]);
+        const result = await connection.query(query, [amount, id, user_id]);
 
         if (result[0].affectedRows > 0){
             return id;
@@ -84,7 +84,7 @@ async function updateGoal(id, amount){
     }
 }
 
-async function deleteGoal(id){
+async function deleteGoal(id, user_id){
     // Database
     let connection;
     try{
@@ -97,9 +97,9 @@ async function deleteGoal(id){
     // Delete goal
     try{
         const query = `
-        DELETE FROM goals WHERE id = ?  
+        DELETE FROM goals WHERE id = ? AND user_id = ? 
         `;
-        const result = await connection.query(query, [id]);
+        const result = await connection.query(query, [id, user_id]);
 
         if (result[0].affectedRows > 0){
             return id;
