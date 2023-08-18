@@ -22,7 +22,7 @@ function checkAuthorization (req, res, next) {
         return res.status(401).json({ error: 'Authorization token not provided' });
     try{
         const token = auth.replace('Bearer ', '');
-        req.user = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = jwt.verify(token, process.env.secretKey);
         next();
     }catch{
         return res.status(403).json({ error: 'Invalid authorization token' });

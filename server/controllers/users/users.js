@@ -17,6 +17,8 @@ async function usersSignUp (req, res){
         const name = req.body.name
         const password = req.body.password
         const last_updated = new Date()
+
+        console.log([email, name, password, last_updated])
     
         const userData = await signUpUsers (name, email, password, last_updated)
     
