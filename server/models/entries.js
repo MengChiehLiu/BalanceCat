@@ -54,7 +54,7 @@ async function getAEntry(user_id, entry_id){
             .join('subjects as s', 's.id=ed.subject_id')
             .query()
 
-        if (entry.length === 0) throw "invalid entry_id or user_id"
+        if (entry[0].id === null) throw "invalid entry_id or user_id"
         return entry[0];
 
     }catch(err){
