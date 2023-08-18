@@ -106,9 +106,9 @@ async function usersPictureUpdate(req, res) {
   
       const picturePath = req.file.path.replace('public/', '');
       const protocol = req.protocol;  // 通常是 'http' 或 'https'
-      const host = req.get('host');   // 獲取主機名，例如 '127.0.0.1:3000'
+      const host = '54.236.231.127';   // 獲取主機名，例如 '127.0.0.1:3000'
       const serverUrl = `${protocol}://${host}`;
-      const pictureUrl = `${serverUrl}/images/${path.basename(picturePath)}`;
+      const pictureUrl = `${serverUrl}/api/1.0/images/${path.basename(picturePath)}`;
   
       await updateUserPicture(userId, pictureUrl);
   

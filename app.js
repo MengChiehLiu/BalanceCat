@@ -18,7 +18,7 @@ const rateLimiter = require('./server/utils/rateLimiter.js');
 app.use(rateLimiter);
 
 // 將 public 目錄設為靜態目錄
-app.use(express.static('public'));
+app.use('/api/1.0', express.static('./public'));
 
 // APIs
 app.use('/', require('./server/views/api.js'));
