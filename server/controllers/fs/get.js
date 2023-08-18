@@ -20,9 +20,8 @@ async function routerGet(res, user_id, month){
 };
 
 // router
-router.get( '/', async(req, res)=>{
-    // const user_id = req.user._id;
-    const user_id = 1;
+router.get( '/', checkAuthorization, async(req, res)=>{
+    const user_id = req.user.id;
     const month = req.query.month
 
     await routerGet(res, user_id, month);

@@ -19,9 +19,8 @@ async function routerGet(res, user_id, type){
 };
 
 // router
-router.get( '/', async(req, res)=>{
-    // const user_id = req.user._id;
-    const user_id = 1;
+router.get( '/', checkAuthorization, async(req, res)=>{
+    const user_id = req.user.id;
     const type = req.query.type
 
     await routerGet(res, user_id, type);

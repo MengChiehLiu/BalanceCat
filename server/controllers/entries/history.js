@@ -25,9 +25,8 @@ async function routerGet(res, user_id, subject_id, start, end){
 };
 
 // router
-router.get( '/history', async(req, res)=>{
-    // const user_id = req.user._id;
-    const user_id = 1;
+router.get( '/history', checkAuthorization, async(req, res)=>{
+    const user_id = req.user.id;
     const subject_id = req.query.subject_id;
     const start = req.query.start;
     const end = req.query.end;

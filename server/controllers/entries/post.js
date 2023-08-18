@@ -19,10 +19,9 @@ async function routerPost(res, user_id, details, description, timestamp){
     };
 };
 
-// router checkAuthorization
-router.post( '/', checkContentType(), checkBody(toCheck), async(req, res)=>{
-    // const user_id = req.user._id;
-    const user_id = 1;
+// router
+router.post( '/', checkAuthorization, checkContentType(), checkBody(toCheck), async(req, res)=>{
+    const user_id = req.user.id;
     const details = req.body.details;
     const timestamp = req.body.timestamp;
 

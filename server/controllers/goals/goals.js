@@ -12,7 +12,7 @@ const {setGoal,updateGoal,deleteGoal,getGoal} = require('../../models/goals.js')
 // set goals
 async function goalSet (req, res) {
     try {
-        const user_id = 1;  // const userId = req.user._id; 
+        const user_id = req.user.id;
         const subject_id = req.body.subject_id;
         const amount = req.body.amount;
     
@@ -35,7 +35,7 @@ async function goalSet (req, res) {
 // update goals
 async function goalUpdate (req, res) {
     try {
-        const user_id = 1;  // const userId = req.user._id; 
+        const user_id = req.user.id;
         const id = req.params.id; // Retrieve id from URL params
         const amount = req.body.amount;
     
@@ -57,7 +57,7 @@ async function goalUpdate (req, res) {
 // delete goals
 async function goalDelete (req, res) {
     try {
-        const user_id = 1;  // const userId = req.user._id; 
+        const user_id = req.user.id;
         const id = req.params.id; // Retrieve id from URL params
     
         const goal_id = await deleteGoal(id);
@@ -78,7 +78,7 @@ async function goalDelete (req, res) {
 // get goals
 async function goalGet (req, res) {
     try {
-        const user_id = 1;  // const userId = req.user._id; 
+        const user_id = req.user.id;
         const inputDate = new Date();
         const duration = req.body.duration
     
@@ -96,10 +96,10 @@ async function goalGet (req, res) {
 
 
 
-router.post('/', checkContentType(), checkBody(toCheck_goalSet), goalSet);
-router.put('/:id', checkContentType(), checkBody(toCheck_goalUpdate),  goalUpdate);
-router.delete('/:id', checkContentType(),  goalDelete);
-router.get('/', checkContentType(),  goalGet);
+router.post('/', checkAuthorization, checkContentType(), checkBody(toCheck_goalSet), goalSet);
+router.put('/:id', checkAuthorization, checkContentType(), checkBody(toCheck_goalUpdate),  goalUpdate);
+router.delete('/:id', checkAuthorization, checkContentType(),  goalDelete);
+router.get('/', checkAuthorization, checkContentType(),  goalGet);
 
 module.exports = router;
 
