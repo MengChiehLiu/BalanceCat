@@ -90,5 +90,6 @@ async function copyBalance(client, user_id, timestamp){
 
 
 module.exports = {
-    updateBalance: updateBalance
+    updateBalance: updateBalance,
+    copyBalance: copyBalance
 }

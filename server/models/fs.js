@@ -6,10 +6,8 @@ async function getFS(user_id, month){
     const client = new SqlClient();
     await client.connect();
 
-    month = `${month}-01`
-
     try{
-        const [fs] = await client
+        let [fs] = await client
             .select('balances')
             .where({'user_id=?': user_id, 'month=?':month, 'subject_id<?':3000})
             .as('b')
@@ -19,9 +17,8 @@ async function getFS(user_id, month){
             .where({}, {'amount>?': 0, 'id % 100 = ?': 0})
             .query()
         
+        return buildHierarchyFS(fs, null)
 
-        const a = buildHierarchyFS(fs, null)
-        return a
     }catch(err){
         console.log(err);
         return null;
