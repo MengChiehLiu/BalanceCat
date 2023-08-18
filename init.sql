@@ -8,6 +8,7 @@ CREATE TABLE users(
     name VARCHAR(255) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
+    picture VARCHAR(255),
     last_updated DATE NOT NULL
 );
 
@@ -163,7 +164,7 @@ INSERT INTO subjects (id, name, is_debit, parent_id) VALUES
 
 
 -- mock data
-INSERT INTO users (name, email, password, last_updated) VALUES ('Jack', 'test@gmail.com', 'test', '2023-03-01');
+INSERT INTO users (name, email, password, last_updated) VALUES ('Jack', 'test@gmail.com', '$2b$10$utwwc71ynkivAvGZom5GQOGTWJ0iYMwfdWB1cGZjSpaQGFMa3JWvu', '2023-03-01');
 INSERT INTO entries (user_id, timestamp) VALUES
     (1, '2023/07/01 23:00:00'),
     (1, '2023/07/02 23:00:00'),
