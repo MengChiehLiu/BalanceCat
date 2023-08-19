@@ -39,7 +39,7 @@ services:
     image: mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: "${MYSQL_PASSWORD}"
+      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
     volumes:
       - balanceCat_mysql_volume:/var/lib/mysql
     networks:

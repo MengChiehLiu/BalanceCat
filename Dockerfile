@@ -6,4 +6,4 @@ EXPOSE 3000
 COPY . .
 RUN npm install -g pm2 && npm install --production
 
-CMD pm2-runtime start app.js --name app
+CMD pm2-runtime start pm2-config.json

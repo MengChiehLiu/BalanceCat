@@ -1,0 +1,15 @@
+{
+    "apps": [
+      {
+        "name": "express-app",
+        "script": "app.js",
+        "autorestart": true
+      },
+      {
+        "name": "schedulers",
+        "script": "schedulers.js",
+        "autorestart": true
+      }
+    ]
+  }
+  
