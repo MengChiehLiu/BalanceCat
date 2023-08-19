@@ -7,12 +7,12 @@ on:
 
 jobs:
     deploy:
-        runs-on: ububtu-latest
+        runs-on: ubuntu-latest
         steps:
             - name: Checkout code
               uses: actions/checkout@v3
 
-            - name: SSH into EC2 instance and deploy Docker image
+            - name: SSH into EC2 instance and deploy services
               run: |
                 echo "${{ secrets.EC2_PRIVATE_KEY  }}" > private_key && chmod 600 private_key
                 ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.EC2_USERNAME  }}@${{ secrets.EC2_HOST  }} '
