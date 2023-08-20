@@ -130,9 +130,15 @@ async function copyBalances(){
                 SELECT user_id, subject_id, amount, month from balances
                 WHERE month=?
             );
-
+            
             UPDATE temp_table SET month=?;
             UPDATE temp_table SET amount=0 WHERE subject_id>=4000;
+            
+            -- 將當期損益移至保留盈餘
+            UPDATE temp_table AS t1
+            JOIN temp_table AS t2 ON t1.user_id = t2.user_id
+            SET t1.amount = t2.amount, t2.amount = 0
+            WHERE t1.subject_id = 3100 AND t2.subject_id = 3200;
 
             INSERT INTO balances SELECT user_id, subject_id, amount, month FROM temp_table;
             `

@@ -1,9 +1,9 @@
 const {SqlClient} = require('../utils/ORM');
+const {CustomError} = require('../utils/others');
 
 // support function
 
 async function register(client, user_id, entry_id, timestamp, details){
-    // console.log('start register')
 
     try{
         let query = ''
@@ -17,7 +17,7 @@ async function register(client, user_id, entry_id, timestamp, details){
             }else{
                 const book_value = detail.register.book_value
                 const new_book_value = book_value + amount
-                if (book_value*new_book_value < 0) throw 'Invalid write off operation'
+                if (book_value*new_book_value < 0) throw new CustomError('Invalid write off operation')
 
                 query += `UPDATE registers SET book_value=?, is_expired=? WHERE id=?;`
                 values.push(new_book_value)
@@ -28,11 +28,10 @@ async function register(client, user_id, entry_id, timestamp, details){
 
         if (query) await client.query(query, values);
 
-        // console.log('finish register')
         return;
     }catch(err){
-        console.log(err)
-        throw `register fail`
+        console.log(`register fail`)
+        throw err
     }finally{
         client.clear();
     }
@@ -41,12 +40,18 @@ async function register(client, user_id, entry_id, timestamp, details){
 // router function
 
 async function getRegisters(user_id, type){
+    
+    // choose condition according to type
     let condition;
     if (type==='assets') condition = 'subject_id > 1200 AND subject_id < 1300'
     else if (type==='liabilities') condition = 'subject_id > 2200 AND subject_id < 2300'
     else if (type==='ar') condition = 'subject_id = 1103'
     else if (type==='ap') condition = 'subject_id = 1104'
-    else throw 'invalid query'
+    else throw new CustomError('Invalid query, type should be one of assets/liabilities/ar/ap.')
+
+    // query DB start here
+    const client = new SqlClient();
+    await client.connect();
 
     const toSelect = `
         r.id, r.initial_value, r.book_value, r.expired_in, r.is_expired, r.entry_id,
@@ -54,11 +59,7 @@ async function getRegisters(user_id, type){
         JSON_OBJECT('id', s.id, 'name', s.name, 'is_debit', s.is_debit) AS subject
     `
 
-    client = new SqlClient();
-    await client.connect();
-
     try{
-        await client.transaction();
         const [registers] = await client
             .select('registers')
             .where({'user_id=?': user_id, [condition]: null, 'is_expired=?': false})
@@ -67,12 +68,11 @@ async function getRegisters(user_id, type){
             .join('subjects as s', 'r.subject_id=s.id')
             .query()
         
-        await client.commit();
         return registers;
+
     }catch(err){
-        console.log(err);
-        await client.rollback();
-        return null;
+        throw err;
+
     }finally{
         client.close();
     }

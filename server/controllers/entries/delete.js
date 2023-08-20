@@ -15,7 +15,7 @@ async function routerDelete(req, res){
         await deleteAnEntry(user_id, entry_id)
         return res.json({data: {entry: {id: entry_id}}});
     }catch(err){
-        if (err.message === 'self-defined') return res.status(400).json({error: err.message});
+        if (err.name === 'CustomError') return res.status(400).json({error: err.message});
         console.log(err);
         return res.status(500).json({error: 'Internal Server Error'});
     }

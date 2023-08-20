@@ -75,8 +75,17 @@ function getRelatedIds(subject_id){
     else return [subject_id, parent, grandparent]
 };
 
+class CustomError extends Error {
+    constructor(message) {
+      super(message);
+      this.name = "CustomError";
+    }
+}
+
+
 module.exports = {
     buildHierarchyIS: buildHierarchyIS,
     buildHierarchyFS: buildHierarchyFS,
-    getRelatedIds: getRelatedIds
+    getRelatedIds: getRelatedIds,
+    CustomError: CustomError
 }

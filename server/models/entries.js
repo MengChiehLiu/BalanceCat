@@ -1,29 +1,27 @@
 const {SqlClient} = require('../utils/ORM');
 const {register} = require('../models/registers')
 const {updateBalances} = require('../models/balances')
-const {lastUpdate} = require('../models/users')
+const {CustomError} = require('../utils/others');
 
 
 // helper function
 async function insertEntryDetails(client, entry_id, details){
 
-    // console.log('start insertEntryDetails')
     try{
         const query = `INSERT INTO entryDetails (entry_id, subject_id, amount, description) VALUES ?;`
-        let values = [[]];
-        for (let detail of details) values[0].push([entry_id, detail.subject_id, detail.amount, detail.description]);
+        let aValue = [];
+        for (let detail of details) aValue.push([entry_id, detail.subject_id, detail.amount, detail.description]);
 
-        await client.query(query, values)
-
-        // console.log('finish insertEntryDetails')
+        await client.query(query, [aValue])
         return;
+
     }catch(err){
-        console.log(err)
-        throw 'insertEntryDetails fail'
+        console.log('insertEntryDetails fail')
+        throw err
     }
 }
 
-// route function
+// router functions
 async function getAnEntry(user_id, entry_id){
     client = new SqlClient();
     await client.connect();
@@ -52,21 +50,19 @@ async function getAnEntry(user_id, entry_id){
             .select('e', toSelect)
             .join('entryDetails as ed', 'e.id=ed.entry_id')
             .join('subjects as s', 's.id=ed.subject_id')
+            .group('id')
             .query()
 
-        if (entry[0].id === null) throw "invalid entry_id or user_id"
+        if (entry[0].length === 0) throw new CustomError("Invalid access.")
         return entry[0];
 
     }catch(err){
-        console.log(err)
-        return null;
+        throw err;
 
     }finally{
         client.close();
     }
 }
-
-
 
 async function postAnEntry(user_id, details, timestamp, parent_id){
     client = new SqlClient();
@@ -88,21 +84,19 @@ async function postAnEntry(user_id, details, timestamp, parent_id){
             insertEntryDetails(client, entry_id, details),
             updateBalances(client, user_id, month, details),
             register(client, user_id, entry_id, timestamp, details)
-            // ,lastUpdate(client, user_id, timestamp)
         ]);
 
         await client.commit();
         return entry_id;
+        
     }catch(err){
-        console.log(err);
         await client.rollback();
-        return null;
+        throw err;
 
     }finally{
         client.close();
     };
 }
-
 
 async function deletingAnEntryWithId(client, entry_id){
     try{
@@ -111,8 +105,8 @@ async function deletingAnEntryWithId(client, entry_id){
         await client.query(query, values);
         return ;
     }catch(err){
-        console.log(err);
-        throw new Error('Delete an entry with id fail.');
+        console.log('deletingAnEntryWithId fail.');
+        throw err
     }
 }
 
@@ -126,8 +120,8 @@ async function deleteAnEntry(user_id, entry_id){
             .where({'user_id=?': user_id, 'id=?': entry_id})
             .query()
 
-        if (entry.length===0) throw new Error("Invalid access.")
-        if (entry[0].parent_id) throw new Error("Cannot delete child entry, operate on parent entry instead.")
+        if (entry.length===0) throw new CustomError("Invalid access.")
+        if (entry[0].parent_id) throw new CustomError("Cannot delete child entry, operate on parent entry instead.")
         client.clear();
         
         const month = entry[0].month
@@ -153,7 +147,6 @@ async function deleteAnEntry(user_id, entry_id){
     }
 }
 
-
 async function getEntryHistory(user_id, subject_id, start, end){
     const client = new SqlClient();
     await client.connect();
@@ -169,11 +162,10 @@ async function getEntryHistory(user_id, subject_id, start, end){
                 ), 
                 "amount", ed.amount,
                 "description", ed.description)  
-          ) AS details
+        ) AS details
     `
   
     try{
-        await client.transaction();
         
         client
             .select('entries')
@@ -189,14 +181,10 @@ async function getEntryHistory(user_id, subject_id, start, end){
         if (subject_id) client.where({'s.subject_id=?': subject_id})
             
         const [entryHistory] = await client.query()
-  
-        await client.commit();
         return entryHistory;
 
     }catch(err){
-        console.log(err);
-        await client.rollback();
-        return null;
+        throw err;
 
     }finally{
         client.close();

@@ -14,10 +14,10 @@ async function routerPost(req, res){
         const timestamp = req.body.timestamp;
 
         const entry_id = await postAnEntry(user_id, details, timestamp);
-        if (entry_id) return res.json({data: {entry: {id: entry_id}}});
-        return res.status(400).json({error: 'Invalid Entry'});
+        return res.json({data: {entry: {id: entry_id}}});
 
     }catch(err){
+        if (err.name === 'CustomError') return res.status(400).json({error: err.message});
         console.log(err);
         return res.status(500).json({error: 'Internal Server Error'});
     };

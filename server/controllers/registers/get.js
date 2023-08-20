@@ -16,6 +16,7 @@ async function routerGet(req, res){
         return res.status(400).json({error: 'Invalid Entry'});
 
     }catch(err){
+        if (err.name === 'CustomError') return res.status(400).json({error: err.message});
         console.log(err);
         return res.status(500).json({error: 'Internal Server Error'});
     };

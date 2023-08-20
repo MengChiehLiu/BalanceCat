@@ -13,9 +13,10 @@ async function routerGet(req, res){
         const entry_id = req.params.entry_id;
         
         const entry = await getAnEntry(user_id, entry_id)
-        if (entry) return res.json({data: {entry: entry}});
-        return res.status(400).json({error: 'Invalid Entry'});
+        return res.json({data: {entry: entry}});
+
     }catch(err){
+        if (err.name === 'CustomError') return res.status(400).json({error: err.message});
         console.log(err);
         return res.status(500).json({error: 'Internal Server Error'});
     }

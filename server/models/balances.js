@@ -2,14 +2,6 @@ const {SqlClient} = require('../utils/ORM');
 const {getRelatedIds} = require('../utils/others');
 
 
-// helper function
-function getRelatedIds(subject_id){
-    let parent = Math.floor(subject_id / 100) * 100
-    let grandparent = Math.floor(subject_id / 1000) * 1000
-    if (subject_id >= 4000) return [subject_id, parent, grandparent, 3000, 3200]
-    else return [subject_id, parent, grandparent]
-};
-
 async function updateBalances(client, user_id, month, details){
     
     try{
@@ -21,7 +13,7 @@ async function updateBalances(client, user_id, month, details){
                 query += `UPDATE balances SET amount=amount+? WHERE user_id=? AND subject_id in (?) AND month>=?;`
             else
                 query += `UPDATE balances SET amount=amount+? WHERE user_id=? AND subject_id in (?) AND month=?;`
-                query += `UPDATE balances SET amount=amount+? WHERE user_id=? AND subject_id=3100 AND month>?;`
+                query += `UPDATE balances SET amount=amount+? WHERE user_id=? AND subject_id in (3000, 3100) AND month>?;`
             values.push(detail.amount)
             values.push(user_id)
             values.push(getRelatedIds(detail.subject_id))
@@ -30,15 +22,13 @@ async function updateBalances(client, user_id, month, details){
 
         await client.query(query, values)     
 
-
         return;
 
     }catch(err){
-        console.log(err);
-        throw 'updateBalance fail'
+        console.log('updateBalance fail');
+        throw err
     }
 }
-
 
 
 module.exports = {

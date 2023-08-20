@@ -15,8 +15,7 @@ async function routerGetHistory(req, res){
         const end = `${req.query.end} 23:59:59`;        
 
         const entryHistory = await getEntryHistory(user_id, subject_id, start, end);
-        if (entryHistory) return res.json({data: {entries: entryHistory}});
-        return res.status(400).json({error: 'Invalid Entry'});
+        return res.json({data: {entries: entryHistory}});
 
     }catch(err){
         console.log(err);
