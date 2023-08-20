@@ -1,17 +1,12 @@
 const {SqlClient} = require('../utils/ORM');
 
 
-function getThreeIdsString(subject_id){
+// depreciate
+function depreciatingGetThreeIds(subject_id){
     let parent = Math.floor(subject_id / 100) * 100
     let grandparent = Math.floor(subject_id / 1000) * 1000
     return `${subject_id}, ${parent}, ${grandparent}`
 };
-
-const a_code = 5108;
-const l_code = 1101;
-const a_codes = getThreeIdsString(a_code);
-const l_codes = getThreeIdsString(l_code);
-
 
 async function depreciatingUpdateRegisters(client, register){
     try{
@@ -54,7 +49,7 @@ async function depreciatingUpdateBalances(client, register, month, codes){
         const query = `
             UPDATE balances
             SET amount=amount-${register.amount}
-            WHERE user_id=${register.user_id} AND month=? AND subject_id in (${getThreeIdsString(register.subject_id)});
+            WHERE user_id=${register.user_id} AND month=? AND subject_id in (${depreciatingGetThreeIds(register.subject_id)});
 
             UPDATE balances
             SET amount=amount+${register.amount}
@@ -69,10 +64,14 @@ async function depreciatingUpdateBalances(client, register, month, codes){
     }
 }
 
-
 async function depreciate(){
     const client = new SqlClient();
     await client.connect();
+
+    const a_code = 5108;
+    const l_code = 1101;
+    const a_codes = depreciatingGetThreeIds(a_code);
+    const l_codes = depreciatingGetThreeIds(l_code);
 
     const timestamp = new Date(); 
     const month = new Date(timestamp.getFullYear(), timestamp.getMonth, 1);
@@ -113,12 +112,58 @@ async function depreciate(){
     }catch(err){
         console.log(err);
         client.rollback();
+        throw new Error('schedulers: depreciate fail')
+
     }finally{
         client.close();
     }
 } 
 
+// copyBalances 
+async function copyBalances(){
+
+    const client = new SqlClient();
+    await client.connect();
+
+    const today = new Date();
+    const month = today.getMonth()+1
+    const thisMonth = new Date(today.getFullYear(), month, 1)
+    const lastMonth = month==1 
+                    ? new Date(today.getFullYear()-1, 12, 1)
+                    : new Date(today.getFullYear(), month-1, 1)
+
+    try{
+        await client.transaction();
+
+        let query = `
+            CREATE TEMPORARY TABLE temp_table AS (
+                SELECT user_id, subject_id, amount, month from balances
+                WHERE month=?
+            );
+
+            UPDATE temp_table SET month=?;
+            UPDATE temp_table SET amount=0 WHERE subject_id>=4000;
+
+            INSERT INTO balances SELECT user_id, subject_id, amount, month FROM temp_table;
+            `
+        let values = [lastMonth, thisMonth];
+
+        await client.query(query, values);
+
+        await client.commit();
+        return;
+
+    }catch(err){
+        console.log(err)
+        await client.rollback();
+        throw new Error('schedulers: copyBalances fail')
+
+    }finally{
+        client.close();
+    }
+}
 
 module.exports = {
-    depreciate: depreciate
+    depreciate: depreciate,
+    copyBalances: copyBalances
 }

@@ -1,8 +1,13 @@
 const schedule = require('node-schedule');
-const {depreciate} = require('./server/schedulers/depreciate.js')
+const {depreciate, copyBalances} = require('./server/models/schedulers.js')
 
-// 月底: 折舊
+// depreciate
 const endOfTheMonth = new schedule.RecurrenceRule();
 endOfTheMonth.date = 28;
 
+// copyBalances
+const beginOfTheMonth = new schedule.RecurrenceRule();
+beginOfTheMonth.date = 1;
+
 schedule.scheduleJob(endOfTheMonth, depreciate);
+schedule.scheduleJob(beginOfTheMonth, copyBalances);
