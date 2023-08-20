@@ -8,7 +8,7 @@ function checkContentType(type='application/json') {
         const content_type = req.header('content-type');
         if (!content_type || content_type.slice(0, type.length) !== type) 
             return res.status(400).json({error: `Only accept ${type}`})
-        next();
+        return next();
     };
 };
 
@@ -35,7 +35,7 @@ function checkBody(fields){
         const body = req.body;
         for (let field of fields)
             if (body[field] === undefined) return res.status(401).json({error: `Request Body Imcomplete: ${field} not found`});
-        next();
+        return next();
     };
 };
  
@@ -73,15 +73,15 @@ function checkDateFormat(checks=['timestamp']){
     const pattern = /^\d{4}-\d{2}-\d{2}$/;
 
     return function(req, res, next){
-        for (const check in checks){
+        for (const check of checks){
             if (check=='timestamp' && !req.query[check])
-                next();
+                return next();
             if (!pattern.test(req.query[check])) 
                 return res.status(400).json({error: `Invalid ${check} format. Expected format: YYYY-MM-DD.`});
             if (isNaN(new Date(req.query[check])))
                 return res.status(400).json({error: 'Invalid date.'})
         }
-        next();
+        return next();
     }
 }
 

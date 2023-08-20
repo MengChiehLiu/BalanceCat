@@ -42,7 +42,7 @@ async function getAnEntry(user_id, entry_id){
             `
 
     try{
-        const [entry] = await client
+        const [entries] = await client
             .select('entries', 'id, timestamp')
             .where({'user_id=?': user_id, 'id=?': entry_id})
             .as('e')
@@ -53,8 +53,8 @@ async function getAnEntry(user_id, entry_id){
             .group('id')
             .query()
 
-        if (entry[0].length === 0) throw new CustomError("Invalid access.")
-        return entry[0];
+        if (entries.length === 0) throw new CustomError("Invalid access.")
+        return entries[0];
 
     }catch(err){
         throw err;
@@ -126,11 +126,10 @@ async function deleteAnEntry(user_id, entry_id){
         
         const month = entry[0].month
         const [details] = await client
-            .select('entryDetails', 'subject_id, amount')
-            .where({'id=?': entry_id})
+            .select('entryDetails', 'subject_id, (amount*-1) AS amount')
+            .where({'entry_id=?': entry_id})
             .query()
             
-
         await client.transaction();
         await Promise.all([
             deletingAnEntryWithId(client, entry_id),
@@ -191,9 +190,47 @@ async function getEntryHistory(user_id, subject_id, start, end){
     }
 }
 
+async function reviseAnEntry(user_id, entry_id, details, timestamp){
+    client = new SqlClient();
+    await client.connect();
+
+    try{
+        const [entry] = await client
+            .select('entries', `id, DATE_FORMAT(timestamp, '%Y-%m-01') AS month, parent_id`)
+            .where({'user_id=?': user_id, 'id=?': entry_id})
+            .query()
+
+        if (entry.length===0) throw new CustomError("Invalid access.")
+        if (entry[0].parent_id) throw new CustomError("Cannot delete child entry, operate on parent entry instead.")
+        client.clear();
+        
+        const month = entry[0].month
+        const [details] = await client
+            .select('entryDetails', 'subject_id, amount')
+            .where({'id=?': entry_id})
+            .query()
+            
+
+        await client.transaction();
+        await Promise.all([
+            deletingAnEntryWithId(client, entry_id),
+            updateBalances(client, user_id, month, details)
+        ])
+        await client.commit();
+    
+    }catch(err){
+        await client.rollback();
+        throw err;
+
+    }finally{
+        client.close();
+    }
+}
+
 module.exports = {
     getAnEntry: getAnEntry,
     postAnEntry: postAnEntry,
     deleteAnEntry: deleteAnEntry,
+    reviseAnEntry: reviseAnEntry,
     getEntryHistory: getEntryHistory
 }

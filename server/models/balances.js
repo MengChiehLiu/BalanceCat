@@ -9,15 +9,18 @@ async function updateBalances(client, user_id, month, details){
         let query = ''
         let values = []
         for (let detail of details){
-            if (detail.subject_id<=3100)
+            if (detail.subject_id<=3100){
                 query += `UPDATE balances SET amount=amount+? WHERE user_id=? AND subject_id in (?) AND month>=?;`
-            else
-                query += `UPDATE balances SET amount=amount+? WHERE user_id=? AND subject_id in (?) AND month=?;`
-                query += `UPDATE balances SET amount=amount+? WHERE user_id=? AND subject_id in (3000, 3100) AND month>?;`
-            values.push(detail.amount)
-            values.push(user_id)
-            values.push(getRelatedIds(detail.subject_id))
-            values.push(month)
+                values.push(...[detail.amount, user_id, getRelatedIds(detail.subject_id), month])
+            }else{
+                query += `
+                    UPDATE balances SET amount=amount+? WHERE user_id=? AND subject_id in (?) AND month=?;
+                    UPDATE balances SET amount=amount+? WHERE user_id=? AND subject_id in (3000, 3100) AND month>?;
+                `
+                values.push(...[
+                    detail.amount, user_id, getRelatedIds(detail.subject_id), month,
+                    detail.amount, user_id, month])
+            }
         }
 
         await client.query(query, values)     
@@ -25,7 +28,7 @@ async function updateBalances(client, user_id, month, details){
         return;
 
     }catch(err){
-        console.log('updateBalance fail');
+        console.log('updateBalances fail');
         throw err
     }
 }
