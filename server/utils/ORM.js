@@ -152,7 +152,8 @@ class SqlClient{
     }
 
     async query(query, values){
-        if (query || values) return await this.client.query(query, values)
+        if (query && values) return await this.client.query(query, values)
+        if (query) return await this.client.query(query)
         else return await this.client.query(this._query, this.values)
     };
 };

@@ -59,9 +59,6 @@ function checkTimestampFormat(req, res, next) {
 
 function checkDetailedTimestampFormat(req, res, next) {
     const timestamp = req.body.timestamp;
-
-    // 檢查 timestamp 是否存在
-    if (!timestamp) return next();  // 若不存在則進入下一 middleware，您也可以選擇返回錯誤
     
     // 使用正則表達式檢查日期格式是否為 YYYY-MM-DD
     const pattern = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;

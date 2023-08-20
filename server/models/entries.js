@@ -81,11 +81,12 @@ async function postAEntry(user_id, details, timestamp, parent_id){
             .query()
 
         const entry_id = result.insertId;
+        const month = `${timestamp.slice(0, 7)}-01`
 
         // insert entry details & update balance & register
         await Promise.all([
             insertEntryDetails(client, entry_id, details),
-            updateBalance(client, user_id, timestamp, details),
+            updateBalance(client, user_id, month, details),
             register(client, user_id, entry_id, timestamp, details),
             lastUpdate(client, user_id, timestamp)
         ]);
@@ -121,16 +122,15 @@ async function deleteAnEntry(user_id, entry_id){
 
     try{
         const [entry] = await client
-            .select('entries', 'id, timestamp, parent_id, is_adjusted')
+            .select('entries', `id, DATE_FORMAT(timestamp, '%Y-%m-01') AS month, parent_id`)
             .where({'user_id=?': user_id, 'id=?': entry_id})
             .query()
 
         if (entry.length===0) throw new Error("Invalid access.")
         if (entry[0].parent_id) throw new Error("Cannot delete child entry, operate on parent entry instead.")
-        if (entry[0].is_adjusted) throw new Error("Cannot delete adjusted entry.")
         client.clear();
         
-        const timestamp = entry[0].timestamp
+        const month = entry[0].month
         const [details] = await client
             .select('entryDetails', 'subject_id, amount')
             .where({'id=?': entry_id})
@@ -140,7 +140,7 @@ async function deleteAnEntry(user_id, entry_id){
         await client.transaction();
         await Promise.all([
             deletingAnEntryWithId(client, entry_id),
-            updateBalance(client, user_id, timestamp, details)
+            updateBalance(client, user_id, month, details)
         ])
         await client.commit();
     

@@ -73,8 +73,8 @@ async function depreciate(){
     const a_codes = depreciatingGetThreeIds(a_code);
     const l_codes = depreciatingGetThreeIds(l_code);
 
-    const timestamp = new Date(); 
-    const month = new Date(timestamp.getFullYear(), timestamp.getMonth, 1);
+    const [yaer, month] = new Date().toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' }).split('/');
+    const timestamp = `${yaer}/${month}/1`;
 
     try{
         // get registers list
@@ -98,7 +98,7 @@ async function depreciate(){
                 await Promise.all([
                     depreciatingUpdateRegisters(client, register),
                     depreciatingInsertEntries(client, register, timestamp, code),
-                    depreciatingUpdateBalances(client, register, month, codes)
+                    depreciatingUpdateBalances(client, register, timestamp, codes)
                 ])
                 await client.commit();
             }catch(err){
@@ -125,12 +125,9 @@ async function copyBalances(){
     const client = new SqlClient();
     await client.connect();
 
-    const today = new Date();
-    const month = today.getMonth()+1
-    const thisMonth = new Date(today.getFullYear(), month, 1)
-    const lastMonth = month==1 
-                    ? new Date(today.getFullYear()-1, 12, 1)
-                    : new Date(today.getFullYear(), month-1, 1)
+    const [yaer, month] = new Date().toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' }).split('/');
+    const thisMonth = `${yaer}/${month}/1`
+    const lastMonth = month==1 ? `${yaer-1}/12/1` : `${yaer}/${month-1}/1`
 
     try{
         await client.transaction();

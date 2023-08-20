@@ -28,8 +28,8 @@ async function routerGet(res, user_id, subject_id, start, end){
 router.get( '/history', checkAuthorization, async(req, res)=>{
     const user_id = req.user.id;
     const subject_id = req.query.subject_id;
-    const start = req.query.start;
-    const end = req.query.end;
+    const start = req.query.start.replace('-', '/');
+    const end = req.query.end.replace('-', '/');
 
     await routerGet(res, user_id, subject_id, start, end);
 });
