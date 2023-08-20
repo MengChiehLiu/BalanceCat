@@ -102,6 +102,58 @@ async function postAEntry(user_id, details, timestamp, parent_id){
     };
 }
 
+
+async function deletingAnEntryWithId(client, entry_id){
+    try{
+        const query = `DELETE FROM entries WHERE id=?`;
+        const values = entry_id;
+        await client.query(query, values);
+        return ;
+    }catch(err){
+        console.log(err);
+        throw new Error('Delete an entry with id fail.');
+    }
+}
+
+async function deleteAnEntry(user_id, entry_id){
+    client = new SqlClient();
+    await client.connect();
+
+    try{
+        const [entry] = await client
+            .select('entries', 'id, timestamp, parent_id, is_adjusted')
+            .where({'user_id=?': user_id, 'id=?': entry_id})
+            .query()
+
+        if (entry.length===0) throw new Error("Invalid access.")
+        if (entry[0].parent_id) throw new Error("Cannot delete child entry, operate on parent entry instead.")
+        if (entry[0].is_adjusted) throw new Error("Cannot delete adjusted entry.")
+        client.clear();
+        
+        const timestamp = entry[0].timestamp
+        const [details] = await client
+            .select('entryDetails', 'subject_id, amount')
+            .where({'id=?': entry_id})
+            .query()
+            
+
+        await client.transaction();
+        await Promise.all([
+            deletingAnEntryWithId(client, entry_id),
+            updateBalance(client, user_id, timestamp, details)
+        ])
+        await client.commit();
+    
+    }catch(err){
+        await client.rollback();
+        throw err;
+
+    }finally{
+        client.close();
+    }
+}
+
+
 async function getEntryHistory(user_id, subject_id, start, end){
     const client = new SqlClient();
     await client.connect();
@@ -154,5 +206,6 @@ async function getEntryHistory(user_id, subject_id, start, end){
 module.exports = {
     getAEntry: getAEntry,
     postAEntry: postAEntry,
+    deleteAnEntry: deleteAnEntry,
     getEntryHistory: getEntryHistory
 }
