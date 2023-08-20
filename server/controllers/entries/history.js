@@ -1,19 +1,19 @@
 const router = require('express').Router();
 
 // import middlewares
-const {checkAuthorization} = require('../../utils/checkRequest');
+const {checkAuthorization, checkDateFormat} = require('../../utils/checkRequest');
+const toCheck = ['start', 'end']
 
 // import models
 const {getEntryHistory} = require('../../models/entries');
 
-async function routerGet(res, user_id, subject_id, start, end){
+async function routerGetHistory(req, res){
     try{
-        
-        // check time validility
-        start = new Date(start);
-        end = new Date(end); end.setHours(23, 59, 59, 999);
-        if (isNaN(start) || isNaN(end)) return res.status(400).json({error: 'invalid time query'});
-        
+        const user_id = req.user.id;
+        const subject_id = req.query.subject_id;
+        const start = req.query.start;
+        const end = `${req.query.end} 23:59:59`;        
+
         const entryHistory = await getEntryHistory(user_id, subject_id, start, end);
         if (entryHistory) return res.json({data: {entries: entryHistory}});
         return res.status(400).json({error: 'Invalid Entry'});
@@ -25,13 +25,5 @@ async function routerGet(res, user_id, subject_id, start, end){
 };
 
 // router
-router.get( '/history', checkAuthorization, async(req, res)=>{
-    const user_id = req.user.id;
-    const subject_id = req.query.subject_id;
-    const start = req.query.start.replace('-', '/');
-    const end = req.query.end.replace('-', '/');
-
-    await routerGet(res, user_id, subject_id, start, end);
-});
-
+router.get( '/history', checkAuthorization, checkDateFormat(toCheck), routerGetHistory);
 module.exports = router;

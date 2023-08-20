@@ -7,11 +7,13 @@ const {checkAuthorization} = require('../../utils/checkRequest');
 const {deleteAnEntry} = require('../../models/entries');
 
 
-async function routerDelete(res, user_id, entry_id){
+async function routerDelete(req, res){
     try{
+        const user_id = req.user.id;
+        const entry_id = req.params.entry_id;
+
         await deleteAnEntry(user_id, entry_id)
         return res.json({data: {entry: {id: entry_id}}});
-
     }catch(err){
         if (err.message === 'self-defined') return res.status(400).json({error: err.message});
         console.log(err);
@@ -19,11 +21,5 @@ async function routerDelete(res, user_id, entry_id){
     }
 }
 
-router.delete('/:entry_id([0-9]+)', checkAuthorization, async(req, res)=>{
-    const user_id = req.user.id;
-    const entry_id = req.params.entry_id;
-
-    await routerDelete(res, user_id, entry_id);
-})
-
+router.delete('/:entry_id([0-9]+)', checkAuthorization, routerDelete)
 module.exports = router;

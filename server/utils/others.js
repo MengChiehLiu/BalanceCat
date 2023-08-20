@@ -68,7 +68,15 @@ function buildHierarchyFS(items, parentId) {
     return hierarchy;
 }
 
+function getRelatedIds(subject_id){
+    let parent = Math.floor(subject_id / 100) * 100
+    let grandparent = Math.floor(subject_id / 1000) * 1000
+    if (subject_id >= 4000) return [subject_id, parent, grandparent, 3000, 3200]
+    else return [subject_id, parent, grandparent]
+};
+
 module.exports = {
     buildHierarchyIS: buildHierarchyIS,
-    buildHierarchyFS: buildHierarchyFS
+    buildHierarchyFS: buildHierarchyFS,
+    getRelatedIds: getRelatedIds
 }

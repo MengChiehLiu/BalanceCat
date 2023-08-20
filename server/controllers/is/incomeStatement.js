@@ -1,13 +1,13 @@
 const router = require('express').Router();
 
 // import middlewares
-const {checkContentType, checkAuthorization, checkBody, checkTimestampFormat} = require('../../utils/checkRequest');
+const {checkContentType, checkAuthorization, checkBody, checkDateFormat} = require('../../utils/checkRequest');
 
 
 // import models
 const {getIncomeStatementData} = require('../../models/incomeStatement');
 
-router.get('/', checkAuthorization, checkTimestampFormat, async(req, res) => {
+router.get('/', checkAuthorization, checkDateFormat, async(req, res) => {
     const userId = req.user.id; 
     const timestamp = req.query.timestamp;
 

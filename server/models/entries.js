@@ -1,6 +1,6 @@
 const {SqlClient} = require('../utils/ORM');
 const {register} = require('../models/registers')
-const {updateBalance} = require('../models/balances')
+const {updateBalances} = require('../models/balances')
 const {lastUpdate} = require('../models/users')
 
 
@@ -24,7 +24,7 @@ async function insertEntryDetails(client, entry_id, details){
 }
 
 // route function
-async function getAEntry(user_id, entry_id){
+async function getAnEntry(user_id, entry_id){
     client = new SqlClient();
     await client.connect();
 
@@ -68,7 +68,7 @@ async function getAEntry(user_id, entry_id){
 
 
 
-async function postAEntry(user_id, details, timestamp, parent_id){
+async function postAnEntry(user_id, details, timestamp, parent_id){
     client = new SqlClient();
     await client.connect();
 
@@ -86,9 +86,9 @@ async function postAEntry(user_id, details, timestamp, parent_id){
         // insert entry details & update balance & register
         await Promise.all([
             insertEntryDetails(client, entry_id, details),
-            updateBalance(client, user_id, month, details),
-            register(client, user_id, entry_id, timestamp, details),
-            lastUpdate(client, user_id, timestamp)
+            updateBalances(client, user_id, month, details),
+            register(client, user_id, entry_id, timestamp, details)
+            // ,lastUpdate(client, user_id, timestamp)
         ]);
 
         await client.commit();
@@ -140,7 +140,7 @@ async function deleteAnEntry(user_id, entry_id){
         await client.transaction();
         await Promise.all([
             deletingAnEntryWithId(client, entry_id),
-            updateBalance(client, user_id, month, details)
+            updateBalances(client, user_id, month, details)
         ])
         await client.commit();
     
@@ -204,8 +204,8 @@ async function getEntryHistory(user_id, subject_id, start, end){
 }
 
 module.exports = {
-    getAEntry: getAEntry,
-    postAEntry: postAEntry,
+    getAnEntry: getAnEntry,
+    postAnEntry: postAnEntry,
     deleteAnEntry: deleteAnEntry,
     getEntryHistory: getEntryHistory
 }

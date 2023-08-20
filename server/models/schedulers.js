@@ -1,12 +1,5 @@
 const {SqlClient} = require('../utils/ORM');
-
-
-// depreciate
-function depreciatingGetThreeIds(subject_id){
-    let parent = Math.floor(subject_id / 100) * 100
-    let grandparent = Math.floor(subject_id / 1000) * 1000
-    return `${subject_id}, ${parent}, ${grandparent}`
-};
+const {getRelatedIds} = require('../utils/others');
 
 async function depreciatingUpdateRegisters(client, register){
     try{
@@ -49,13 +42,13 @@ async function depreciatingUpdateBalances(client, register, month, codes){
         const query = `
             UPDATE balances
             SET amount=amount-${register.amount}
-            WHERE user_id=${register.user_id} AND month=? AND subject_id in (${depreciatingGetThreeIds(register.subject_id)});
+            WHERE user_id=${register.user_id} AND month=? AND subject_id in (?);
 
             UPDATE balances
             SET amount=amount+${register.amount}
-            WHERE user_id=${register.user_id} AND month=? AND subject_id in (${codes});
+            WHERE user_id=${register.user_id} AND month=? AND subject_id in (?);
         `
-        const values = [month, month]
+        const values = [month, getRelatedIds(register.subject_id), month, codes]
         await client.query(query, values);
         return;
     }catch(err){
@@ -70,8 +63,8 @@ async function depreciate(){
 
     const a_code = 5108;
     const l_code = 1101;
-    const a_codes = depreciatingGetThreeIds(a_code);
-    const l_codes = depreciatingGetThreeIds(l_code);
+    const a_codes = getRelatedIds(a_code);
+    const l_codes = getRelatedIds(l_code);
 
     const [yaer, month] = new Date().toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' }).split('/');
     const timestamp = `${yaer}/${month}/1`;

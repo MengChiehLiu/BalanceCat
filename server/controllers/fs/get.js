@@ -1,15 +1,25 @@
 const router = require('express').Router();
 
 // import middlewares
-const {checkAuthorization, checkTimestampFormat} = require('../../utils/checkRequest');
-
+const {checkAuthorization, checkDateFormat} = require('../../utils/checkRequest');
 
 // import models
 const {getFS} = require('../../models/fs');
 
-async function routerGet(res, user_id, month){
+async function routerGet(req, res){
     try{
-        const fs = await getFS(user_id, month)
+        const user_id = req.user.id;
+        let timestamp = req.query.timestamp
+
+        if (!timestamp){
+            const [year, month] = new Date().toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' }).split('/')
+            timestamp = `${year}/${month}/1`
+        }else{
+            timestamp = `${timestamp.slice(0, 7)}-01`
+            if (new Date(timestamp) > new Date()) return res.status('400').json({error: 'Future Request Is Not Allowed'})
+        }
+
+        const fs = await getFS(user_id, timestamp)
         if (fs) return res.json({data: {subjects: fs}});
         return res.status(400).json({error: 'Invalid Entry'});
 
@@ -20,19 +30,5 @@ async function routerGet(res, user_id, month){
 };
 
 // router
-router.get( '/', checkAuthorization, checkTimestampFormat, async(req, res)=>{
-    const user_id = req.user.id;
-    const timestamp = req.query.timestamp
-    const [year, month] = new Date().toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' }).split('/')
-
-    if (!timestamp){
-        timestamp = `${year}/${month}/1`
-    }else{
-        timestamp = `${timestamp.slice(0, 7)}-1`
-        if (new Date(timestamp) > new Date(`${year}/${month}/1`)) return res.status('400').json({error: 'Future Request Is Not Allowed'})
-    }     
-
-    await routerGet(res, user_id, timestamp);
-});
-
+router.get( '/', checkAuthorization, checkDateFormat(), routerGet);
 module.exports = router;
