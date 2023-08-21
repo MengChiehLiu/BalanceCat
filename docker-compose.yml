@@ -26,6 +26,7 @@ services:
     restart: always
     volumes:
       - balanceCat_server_volume:/shared_data/server
+      - ./public:/BalanceCat/public
     ports:
       - "3000:3000"
     networks:
