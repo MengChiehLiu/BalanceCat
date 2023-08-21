@@ -1,7 +1,7 @@
 FROM node:18.16.1-alpine
 
-WORKDIR /BalanceCat
-EXPOSE 3000
+WORKDIR /BalanceCat/backend
+EXPOSE 3001
 
 COPY . .
 RUN npm install -g pm2 && npm install --production

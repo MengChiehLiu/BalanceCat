@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const multer = require('multer');
 const path = require('path');
-
+require('dotenv').config();
 
 
 
@@ -106,7 +106,7 @@ async function usersPictureUpdate(req, res) {
       });
   
       const protocol = req.protocol;  // 通常是 'http' 或 'https'
-      const host = '54.236.231.127';   // 獲取主機名，例如 '127.0.0.1:3000'
+      const host = process.env.BACKEND_HOST;   // 獲取主機名，例如 '127.0.0.1:3000'
       const serverUrl = `${protocol}://${host}`;
       const pictureUrl = `${serverUrl}/api/1.0/images/${path.basename(req.file.path)}`;
   

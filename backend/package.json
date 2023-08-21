@@ -1,21 +1,21 @@
 {
-  "name": "balancemate",
+  "name": "balancecat",
   "version": "1.0.0",
-  "description": "BalanceMate: Your Personal Double Entry Bookkeeping Simplified",
+  "description": "BalanceCat: Your Personal Double Entry Bookkeeping Simplified",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MengChiehLiu/BalanceMate.git"
+    "url": "git+https://github.com/MengChiehLiu/BalanceCat.git"
   },
   "author": "Meng-Chieh Liu",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/MengChiehLiu/BalanceMate/issues"
+    "url": "https://github.com/MengChiehLiu/BalanceCat/issues"
   },
-  "homepage": "https://github.com/MengChiehLiu/BalanceMate#readme",
+  "homepage": "https://github.com/MengChiehLiu/BalanceCat#readme",
   "dependencies": {
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",

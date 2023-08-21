@@ -177,7 +177,7 @@ async function getEntryHistory(user_id, subject_id, start, end){
             .group('id')
             .order('timestamp DESC, amount')
         
-        if (subject_id) client.where({'s.subject_id=?': subject_id})
+        if (subject_id) client.where({'s.id=?': subject_id})
             
         const [entryHistory] = await client.query()
         return entryHistory;
