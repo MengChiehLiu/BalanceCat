@@ -240,11 +240,37 @@ async function updateUserPicture(userId, pictureUrl) {
     }
 }
 
+
+// User's Memo
+async function updateUserMemo(user_id, title, content){
+
+    let client;
+    try {
+        client = await pool.getConnection();
+    } catch (err) {
+        console.error("[updateUserMemo] Failed to get connection:");
+        throw err;
+    }
+
+    try {
+        const query = 'UPDATE users SET memo_title=?, memo_content=? WHERE id=?';
+        await connection.query(query, [title, content, user_id]);
+
+    } catch(err){
+        console.error('[updateUserMemo] Error updating user memo:');
+        throw err;
+    
+    } finally {
+        connection.release();
+    }
+}
+
 module.exports = { 
   signUpUsers: signUpUsers,
   signInUsers: signInUsers,
   lastUpdate: lastUpdate,
-  updateUserPicture: updateUserPicture
+  updateUserPicture: updateUserPicture,
+  updateUserMemo: updateUserMemo
 }
 
 
