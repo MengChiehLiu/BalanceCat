@@ -262,7 +262,7 @@ async function updateUserMemo(user_id, title, content){
         throw err;
     
     } finally {
-        client.release();
+        connection.release();
     }
 }
 
