@@ -1,0 +1,28 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+
+  gap: 1rem;
+  .accountboxs {
+    display: flex;
+    gap: 2rem;
+    .debitboxs {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .creditboxs {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+  .btn {
+    width: 450px;
+    height: 50px;
+    margin: auto;
+    background-color: #201035;
+    border-radius: 20px;
+  }
+}

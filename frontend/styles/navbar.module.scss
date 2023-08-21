@@ -1,0 +1,74 @@
+.wrapper {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-between;
+  background-color: #171721;
+  height: 80px;
+  .leftBar {
+    display: flex;
+    align-items: center;
+    margin-left: 5vw;
+    gap: 12px;
+    .image {
+      object-fit: cover;
+      object-position: center;
+      //   margin-right: 1rem;
+    }
+    .title {
+      font-family: Inter;
+      font-size: 1.7rem;
+      font-style: normal;
+      font-weight: 600;
+      line-height: 1.5rem;
+      color: #d9d9d9;
+      background: none;
+      border: none;
+      cursor: pointer;
+      margin-right: 1rem;
+      background: none;
+      text-decoration: none;
+    }
+
+    .link {
+      font-family: Inter;
+      font-style: normal;
+      font-weight: 600;
+      line-height: 1.5rem;
+      color: var(--gray-900, #d9d9d9);
+      font-size: 1rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      margin-right: 1rem;
+      text-decoration: none;
+    }
+  }
+  .rightBar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 5vw;
+    button {
+      font-family: Inter;
+      font-style: normal;
+      font-weight: 600;
+      line-height: 1.5rem;
+      color: var(--gray-900, #d9d9d9);
+      font-size: 1rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      margin-right: 1rem;
+    }
+    .freeTrial {
+      border-radius: 8px;
+      border: 2px solid var(--primary-01, #485aff);
+      background: var(--primary-01, #485aff);
+      color: var(--base-white, #fff);
+      text-align: right;
+      height: 2.5rem;
+      padding: 0 1rem;
+    }
+  }
+}
