@@ -3,7 +3,18 @@ const router = require('express').Router();
 // import models
 const {dataInitDB} = require('../../models/data');
 
-// router
+/**
+ * @swagger
+ * /api/1.0/db/init:
+ *   get:
+ *     summary: Init db
+ *     tags: [db]
+ *     responses:
+ *       200:
+ *         description: Success
+ *       500:
+ *         description: Fail
+ */
 router.post( '/db/init', async(req, res)=>{
     try{
         await dataInitDB()
