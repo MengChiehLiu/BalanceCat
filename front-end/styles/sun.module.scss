@@ -1,0 +1,22 @@
+.test {
+  box-shadow:
+    rgb(250, 250, 250) 0px 0px 100px -40px inset,
+    rgb(255, 183, 75) 0px 0px max(60px, 6vw) max(60px, 6vw) inset,
+    rgb(255, 183, 75) 0px 0px 70px 40px;
+  top: 28vh;
+  aspect-ratio: 1 / 1;
+  width: max(240px, 20vw);
+  position: absolute;
+  left: min(-125px, -10vw);
+
+  border-radius: 50%;
+  background-color: rgb(250, 250, 250);
+  filter: blur(4px);
+  box-sizing: border-box;
+  color: var(--colors-black);
+  font-kerning: normal;
+  font-size: 62.5%;
+  letter-spacing: -0.005em;
+  text-size-adjust: 100%;
+  z-index: -3px;
+}

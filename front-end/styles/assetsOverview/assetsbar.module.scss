@@ -1,0 +1,20 @@
+.wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content:space-around;
+    align-items: center;
+    p {
+        width: 8rem;
+        color: var(--neutral-500, #64748B);
+        text-align: center;
+    }
+    button {
+        padding: 0.1rem 1rem;
+        height: 2.7rem;
+        border-radius: 4px;
+        background: var(--success-green-700, #047857);
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+}
