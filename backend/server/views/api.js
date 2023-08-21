@@ -1,7 +1,7 @@
 const router = require('express').Router();
 
 // health check
-router.get('/', function(req, res){res.send('Hello World!');})
+router.get('/api/1.0', function(req, res){res.send('Hello World!');})
 
 // document
 router.use('/api/1.0/docs',  require('./swagger.js'));

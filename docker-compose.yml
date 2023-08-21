@@ -16,22 +16,21 @@ services:
     networks:
       - balanceCat_network
     depends_on:
-      - frontend
-
-  frontend:
-    container_name: balanceCat_frontend
-    build: 
-      context: ./frontend          
-      dockerfile: Dockerfile
-    restart: always
-    volumes:
-      - balanceCat_frontend_volume:/shared_data/server
-    ports:
-      - "3000:3000"
-    networks:
-      - balanceCat_network
-    depends_on:
+      # - frontend
       - backend
+
+  # frontend:
+  #   container_name: balanceCat_frontend
+  #   build: 
+  #     context: ./frontend          
+  #     dockerfile: Dockerfile
+  #   restart: always
+  #   volumes:
+  #     - balanceCat_frontend_volume:/shared_data/server
+  #   networks:
+  #     - balanceCat_network
+  #   depends_on:
+  #     - backend
 
   backend:
     container_name: balanceCat_backend
@@ -44,8 +43,6 @@ services:
     volumes:
       - balanceCat_backend_volume:/shared_data/server
       - ./backend/public:/BalanceCat/backend/public
-    ports:
-      - "3001:3001"
     networks:
       - balanceCat_network
     depends_on:
@@ -80,7 +77,7 @@ networks:
 volumes:
   balanceCat_nginx_volume:
   balanceCat_backend_volume:
-  balanceCat_frontend_volume:
+  # balanceCat_frontend_volume:
   balanceCat_mysql_volume:
   balanceCat_redis_volume:
   

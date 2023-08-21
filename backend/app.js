@@ -25,9 +25,7 @@ app.use('/', require('./server/views/api.js'));
 
 
 // server
-const server = app.listen(port, host, () => {
-  console.log(`Hello World: http://127.0.0.1:${port}`);
-});
+const server = app.listen(port, host);
 
 
 // graceful shutdown
