@@ -16,12 +16,11 @@ async function routerGet(req, res){
             date = `${year}/${month}/1`
         }else{
             date = `${date.slice(0, 7)}-01`
-            if (new Date(date) > new Date()) return res.status('400').json({error: 'Future Request Is Not Allowed'})
+            if (new Date(date) > new Date()) return res.status(400).json({error: 'Future Request Is Not Allowed'})
         }
 
         const fs = await getFS(user_id, date)
-        if (fs) return res.json({data: {subjects: fs}});
-        return res.status(400).json({error: 'Invalid Entry'});
+        return res.json({data: {subjects: fs}});
 
     }catch(err){
         console.log(err);

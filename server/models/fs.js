@@ -12,16 +12,14 @@ async function getFS(user_id, date){
             .where({'user_id=?': user_id, 'month=?':date, 'subject_id<?':4000})
             .as('b')
 
-            .select('b', 's.id, s.name, s.is_debit, s.parent_id, b.amount')
-            .join('subjects as s', 's.id=b.subject_id')
-            .where({}, {'amount>?': 0, 'id % 100 = ?': 0})
+            .select('subjects as s', 's.id, s.name, s.is_debit, s.parent_id, COALESCE(b.amount, 0) AS amount')
+            .join('b', 's.id=b.subject_id')
             .query()
         
         return buildHierarchyFS(fs, null)
 
     }catch(err){
-        console.log(err);
-        return null;
+        throw err;
 
     }finally{
         client.close();
