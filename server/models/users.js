@@ -244,9 +244,9 @@ async function updateUserPicture(userId, pictureUrl) {
 // User's Memo
 async function updateUserMemo(user_id, title, content){
 
-    let client;
+    let connection;
     try {
-        client = await pool.getConnection();
+        connection = await pool.getConnection();
     } catch (err) {
         console.error("[updateUserMemo] Failed to get connection:");
         throw err;
@@ -255,9 +255,36 @@ async function updateUserMemo(user_id, title, content){
     try {
         const query = 'UPDATE users SET memo_title=?, memo_content=? WHERE id=?';
         await connection.query(query, [title, content, user_id]);
+        return;
 
     } catch(err){
-        console.error('[updateUserMemo] Error updating user memo:');
+        connection.error('[updateUserMemo] Error updating user memo:');
+        throw err;
+    
+    } finally {
+        client.release();
+    }
+}
+
+// User's info
+async function getUserInfo(user_id){
+
+    let connection;
+    try {
+        connection = await pool.getConnection();
+    } catch (err) {
+        console.error("[getUserInfo] Failed to get connection:");
+        throw err;
+    }
+
+    try {
+        const query = 'SELECT name, picture, memo_title, memo_content FROM users WHERE id=?';
+        const [infos] = await connection.query(query, [user_id]);
+
+        return infos[0];
+
+    } catch(err){
+        console.error('[getUserInfo] Error getting user info:');
         throw err;
     
     } finally {
@@ -270,7 +297,8 @@ module.exports = {
   signInUsers: signInUsers,
   lastUpdate: lastUpdate,
   updateUserPicture: updateUserPicture,
-  updateUserMemo: updateUserMemo
+  updateUserMemo: updateUserMemo,
+  getUserInfo: getUserInfo
 }
 
 

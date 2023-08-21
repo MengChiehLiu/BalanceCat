@@ -12,7 +12,7 @@ const toCheck_usersSignIn = ['email','password']
 const toCheck_memo = ['title', 'content']
 
 // import models
-const { signUpUsers, signInUsers, updateUserPicture, updateUserMemo } = require('../../models/users')
+const { signUpUsers, signInUsers, updateUserPicture, updateUserMemo, getUserInfo } = require('../../models/users')
 
 
 // Signup
@@ -136,11 +136,25 @@ async function usersMemoUpdate(req, res) {
   }
 
 
+async function usersGetInfo(req, res) {
+    try{
+      const user_id = req.user.id;
+
+      const info = await getUserInfo(user_id)
+      return res.status(200).json({ data: { user: info } });
+
+    }catch(err){
+      console.error(err);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
+
 
 
 router.post('/signup', checkContentType(),  checkBody(toCheck_usersSignUp), usersSignUp);
 router.post('/signin', checkContentType(),  checkBody(toCheck_usersSignIn), usersSignIn);
 router.put('/picture', checkAuthorization, usersPictureUpdate);
 router.put('/memo', checkAuthorization, checkContentType(), checkBody(toCheck_memo), usersMemoUpdate);
+router.get('/', checkAuthorization, usersGetInfo);
 
 module.exports = router
