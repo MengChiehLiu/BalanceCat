@@ -18,7 +18,8 @@ jobs:
                 ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.EC2_USERNAME  }}@${{ secrets.EC2_HOST  }} '
                     cd /home/ubuntu/BalanceCat &&
                     git pull origin develop &&
-                    echo "${{ secrets.ENV_FILE  }}" > .env &&
+                    echo "${{ secrets.FRONTEND_ENV_FILE  }}" > frontend/.env &&
+                    echo "${{ secrets.BACKEND_ENV_FILE  }}" > backend/.env &&
                     echo "${{ secrets.COMBINED_CRT  }}" > private/combined.crt &&
                     echo "${{ secrets.PRIVATE_KEY  }}" > private/private.key &&
                     sudo docker-compose down &&
