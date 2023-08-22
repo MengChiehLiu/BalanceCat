@@ -12,8 +12,9 @@ async function routerPost(req, res){
         const user_id = req.user.id;
         const details = req.body.details;
         const timestamp = req.body.timestamp;
+        const parent_id = req.body.parent_id;
 
-        const entry_id = await postAnEntry(user_id, details, timestamp);
+        const entry_id = await postAnEntry(user_id, details, timestamp, parent_id);
         return res.json({data: {entry: {id: entry_id}}});
 
     }catch(err){
