@@ -56,7 +56,7 @@ async function getRegisters(user_id, type){
     if (type==='assets') condition = 'subject_id > 1200 AND subject_id < 1300'
     else if (type==='liabilities') condition = 'subject_id > 2200 AND subject_id < 2300'
     else if (type==='ar') condition = 'subject_id = 1103'
-    else if (type==='ap') condition = 'subject_id = 1104'
+    else if (type==='ap') condition = 'subject_id = 2102'
     else throw new CustomError('Invalid query, type should be one of assets/liabilities/ar/ap.')
 
     // query DB start here
