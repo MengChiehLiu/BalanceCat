@@ -3,4 +3,3 @@ node_modules
 *.pem
 *.crt
 *.key
-backend/public/images/*
