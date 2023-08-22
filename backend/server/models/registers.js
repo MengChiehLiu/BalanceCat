@@ -40,7 +40,7 @@ async function register(client, user_id, entry_id, timestamp, details){
 
         return;
     }catch(err){
-        console.log(`register fail`)
+        console.error(`register fail`)
         throw err
     }finally{
         client.clear();

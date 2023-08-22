@@ -19,7 +19,7 @@ async function routerPost(req, res){
 
     }catch(err){
         if (err.name === 'CustomError') return res.status(400).json({error: err.message});
-        console.log(err);
+        console.error(err);
         return res.status(500).json({error: 'Internal Server Error'});
     };
 };

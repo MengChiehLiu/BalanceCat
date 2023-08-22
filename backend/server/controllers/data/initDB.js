@@ -20,7 +20,7 @@ router.post( '/db/init', async(req, res)=>{
         await dataInitDB()
         res.json({message: 'Success :)'})
     }catch(err){
-        console.log(err)
+        console.error(err)
         res.status(500).json({message: 'Fail :('})
     };
 });

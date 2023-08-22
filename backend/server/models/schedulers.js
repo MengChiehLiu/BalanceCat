@@ -11,7 +11,7 @@ async function depreciatingUpdateRegisters(client, register){
         await client.query(query);
         return;
     }catch(err){
-        console.log(err);
+        console.error(err);
         throw new Error(`Depreciate fail: UpdateRegisters fail in id ${register.id}`)
     }
 }
@@ -32,7 +32,7 @@ async function depreciatingInsertEntries(client, register, timestamp, code){
         await client.query(query, values);
         return;
     }catch(err){
-        console.log(err)
+        console.error(err)
         throw new Error(`Depreciate fail: InsertEntries fail in id ${register.id}`)
     }
 }
@@ -52,7 +52,7 @@ async function depreciatingUpdateBalances(client, register, month, codes){
         await client.query(query, values);
         return;
     }catch(err){
-        console.log(err);
+        console.error(err);
         throw new Error(`Depreciate fail: UpdateBalances fail in id ${register.id}`)
     }
 }
@@ -98,7 +98,7 @@ async function depreciate(year=null, month=null){
                 ])
                 await client.commit();
             }catch(err){
-                console.log(err.message);
+                console.error(err.message);
                 await client.rollback();
             }
 
@@ -106,7 +106,7 @@ async function depreciate(year=null, month=null){
         }
 
     }catch(err){
-        console.log(err);
+        console.error(err);
         client.rollback();
         throw new Error('schedulers: depreciate fail')
 
@@ -171,7 +171,7 @@ async function copyBalances(year=null, month=null){
         return;
 
     }catch(err){
-        console.log(err)
+        console.error(err)
         await client.rollback();
         throw new Error('schedulers: copyBalances fail')
 

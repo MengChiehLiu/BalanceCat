@@ -23,7 +23,7 @@ async function routerGet(req, res){
         return res.json({data: {subjects: fs}});
 
     }catch(err){
-        console.log(err);
+        console.error(err);
         return res.status(500).json({error: 'Internal Server Error'});
     };
 };
