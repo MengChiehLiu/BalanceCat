@@ -12,8 +12,8 @@ async function getFS(user_id, date){
             .where({'user_id=?': user_id, 'month=?':date, 'subject_id<?':4000})
             .as('b')
 
-            .select('subjects as s', 's.id, s.name, s.is_debit, s.parent_id, COALESCE(b.amount, 0) AS amount')
-            .join('b', 's.id=b.subject_id')
+            .select('b', 's.id, s.name, s.is_debit, s.parent_id, b.amount')
+            .join('subjects as s', 's.id=b.subject_id')
             .query()
         
         return buildHierarchyFS(fs, null)
