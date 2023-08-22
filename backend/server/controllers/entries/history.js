@@ -18,7 +18,7 @@ async function routerGetHistory(req, res){
         return res.json({data: {entries: entryHistory}});
 
     }catch(err){
-        console.log(err);
+        console.error(err);
         return res.status(500).json({error: 'Internal Server Error'});
     };
 };

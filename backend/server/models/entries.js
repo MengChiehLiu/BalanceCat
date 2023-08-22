@@ -16,7 +16,7 @@ async function insertEntryDetails(client, entry_id, details){
         return;
 
     }catch(err){
-        console.log('insertEntryDetails fail')
+        console.error('[insertEntryDetails] fail: ')
         throw err
     }
 }
@@ -105,7 +105,7 @@ async function deletingAnEntryWithId(client, entry_id){
         await client.query(query, values);
         return ;
     }catch(err){
-        console.log('deletingAnEntryWithId fail.');
+        console.error('[deletingAnEntryWithId] fail:');
         throw err
     }
 }

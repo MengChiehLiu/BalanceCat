@@ -28,7 +28,7 @@ async function updateBalances(client, user_id, month, details){
         return;
 
     }catch(err){
-        console.log('updateBalances fail');
+        console.error('updateBalances fail');
         throw err
     }
 }

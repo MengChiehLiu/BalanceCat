@@ -20,7 +20,7 @@ async function goalSet (req, res) {
         return res.status(200).json({data:{goal:{id:goal_id}}});
 
     } catch (err) {
-        console.log(err);
+        console.error(err);
 
         // Check if the error is because the goal already exists
         if (err.message === "Goal already existed") {
@@ -43,7 +43,7 @@ async function goalUpdate (req, res) {
         return res.status(200).json({data:{goal:{id:goal_id}}});
 
     } catch (err) {
-        console.log(err);
+        console.error(err);
 
         // Check specific error messages and respond accordingly
         if (err.message === "No rows were updated") {
@@ -64,7 +64,7 @@ async function goalDelete (req, res) {
         return res.status(200).json({data:{goal:{id:goal_id}}});
 
     } catch (err) {
-        console.log(err);
+        console.error(err);
 
         // Check specific error messages and respond accordingly
         if (err.message === "No rows were deleted") {
@@ -90,7 +90,7 @@ async function goalGet (req, res) {
         return res.status(200).json(data);
 
     } catch (err) {
-        console.log(err);
+        console.error(err);
         return res.status(500).json({error: 'Internal Server Error'});
     }
 }

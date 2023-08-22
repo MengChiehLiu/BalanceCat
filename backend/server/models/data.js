@@ -11,7 +11,7 @@ async function dataInitDB(){
         await client.query();
         await client.commit();
     }catch(err){
-        console.log(err);
+        console.error(err);
         await client.rollback();
     }finally{
         client.close();
