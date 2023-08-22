@@ -151,7 +151,7 @@ async function getGoal (user_id, inputDate, duration) {
         if (duration) {
             startMonth.setUTCMonth(startMonth.getUTCMonth() - duration);
         } else {
-            startMonth.setUTCMonth(startMonth.getUTCMonth() - 6);
+            startMonth.setUTCMonth(startMonth.getUTCMonth() - 24);
         }
         startMonth.setUTCDate(1);
         console.log("startMonth",startMonth)
@@ -160,36 +160,39 @@ async function getGoal (user_id, inputDate, duration) {
         endMonth.setUTCDate(1);  // 设置为每个月的第一天
         console.log("endMonth",endMonth)     
     
-        let goals = [];
-    
+        const endYear = endMonth.getUTCFullYear();
+        const startYear = startMonth.getUTCFullYear();
+
+        // Initialize years data structure
+        let yearData = {};
+        for (let y = startYear; y <= endYear; y++) {
+            yearData[y] = Array(12).fill(0);  // initialize all months with 0
+        }
+
         for (let i = 0; i < goalsResults[0].length; i++) {
             const goal = goalsResults[0][i];
             const balanceResults = await searchBalance(connection, user_id, goal.subject_id, startMonth, endMonth);
-            const currentMonthString = endMonth.toISOString().slice(0, 7);  // 例如："2023-08"
-            console.log("currentMonthString",currentMonthString)
             const balanceData = balanceResults[0];
-            
-            // 找到當前月份的資料以獲取當前餘額
-            const currentBalance = balanceData.find(b => b.month === currentMonthString) || { amount: 0 };
-            
-            // 过滤掉当前月份
-            const historyData = balanceData.filter(b => b.month !== currentMonthString);
-            
-            goals.push({
-                id: goal.id,
-                subject_id: goal.subject_id,
-                name: goal.name,
-                amount: goal.amount,
-                current_amount: currentBalance.amount, // 使用找到的當前餘額
-                history_amount: historyData.map(b => {
-                    return {
-                        month: b.month.toISOString().slice(0, 7),
-                        amount: b.amount
-                    }
-                })
-            });}
-           
-            return { data: { goals } };
+
+            // Map each balance to its respective month in the year structure
+            for (const balance of balanceData) {
+                const date = new Date(balance.month); // assuming balance.month is a string in format YYYY-MM
+                const year = date.getUTCFullYear();
+                const month = date.getUTCMonth();  // returns 0-11
+                yearData[year][month] = balance.amount;
+            }
+        }
+
+        // Convert yearData to the desired output format
+        let output = [];
+        for (const [year, months] of Object.entries(yearData)) {
+            output.push({
+                data: months,
+                label: parseInt(year)
+            });
+        }
+
+        return { data: { series: output } };
     } catch (err) {
         console.error("Failed to get goals:", err);
         throw err;

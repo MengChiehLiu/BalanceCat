@@ -80,7 +80,7 @@ async function goalGet (req, res) {
     try {
         const user_id = req.user.id;
         const inputDate = new Date();
-        const duration = req.body.duration
+        const duration = parseInt(req.query.duration, 10);
     
         const data = await getGoal(user_id, inputDate, duration);
         return res.status(200).json(data);
@@ -99,7 +99,7 @@ async function goalGet (req, res) {
 router.post('/', checkAuthorization, checkContentType(), checkBody(toCheck_goalSet), goalSet);
 router.put('/:id', checkAuthorization, checkContentType(), checkBody(toCheck_goalUpdate),  goalUpdate);
 router.delete('/:id', checkAuthorization, checkContentType(),  goalDelete);
-router.get('/', checkAuthorization, checkContentType(),  goalGet);
+router.get('/', checkAuthorization, goalGet);
 
 module.exports = router;
 
