@@ -114,29 +114,43 @@ async function deleteGoal(id, user_id){
     }
 }
 
-async function searchBalance(connection, user_id, subject_id, startMonth, currentMonth) {
+async function searchBalance(connection, user_id, subject_id, startYear, endYear) {
+    console.log("searchBalance parameters:", user_id, subject_id, startYear, endYear);
     const query = `
         SELECT * 
         FROM balances
-        WHERE user_id = ? AND subject_id = ? AND month BETWEEN ? AND ?
+        WHERE user_id = ? AND subject_id = ? AND YEAR(month) BETWEEN ? AND ?
         ORDER BY month DESC
     `;
-    return await connection.query(query, [user_id, subject_id, startMonth, currentMonth]);
+    return await connection.query(query, [user_id, subject_id, startYear, endYear]);
 }
 
-async function getGoal (user_id, inputDate, duration) {
+
+function getLastNMonths(startyear, endyear) {
+    let years = [];
+    for (let y = endyear; y >= startyear; y--) {
+        years.push({
+            label: y.toString(),
+            data: new Array(12).fill(0)
+        });
+    }
+    return years;
+}
+
+
+async function getGoal(user_id, startyear, endyear) {
+    // console.log("startyear in getGoal",startyear)
+    // console.log("endyear in getGoal",endyear)
     // Database
     let connection;
-    try{
+    try {
         connection = await pool.getConnection();
-    } catch(err) {
-        console.error("Failed to get connection:",err);
-        throw(err)
+    } catch (err) {
+        console.error("Failed to get connection:", err);
+        throw (err)
     }
 
-    // getGoal 
     try {
-
         const goalsQuery = `
         SELECT g.id, s.name, g.subject_id, g.amount  
         FROM goals g
@@ -144,52 +158,43 @@ async function getGoal (user_id, inputDate, duration) {
         WHERE user_id = ?
         `;
         const goalsResults = await connection.query(goalsQuery, [user_id]);
-        console.log("goalsResults:", goalsResults);
         
-        // 计算时间范围
-        const startMonth = new Date(inputDate);
-        if (duration) {
-            startMonth.setUTCMonth(startMonth.getUTCMonth() - duration);
-        } else {
-            startMonth.setUTCMonth(startMonth.getUTCMonth() - 6);
-        }
-        startMonth.setUTCDate(1);
-        console.log("startMonth",startMonth)
+        // 設置歷史模板
+        const historyTemplate = getLastNMonths(startyear, endyear);
 
-        const endMonth = new Date(inputDate);
-        endMonth.setUTCDate(1);  // 设置为每个月的第一天
-        console.log("endMonth",endMonth)     
-    
         let goals = [];
-    
+
         for (let i = 0; i < goalsResults[0].length; i++) {
             const goal = goalsResults[0][i];
-            const balanceResults = await searchBalance(connection, user_id, goal.subject_id, startMonth, endMonth);
-            const currentMonthString = endMonth.toISOString().slice(0, 7);  // 例如："2023-08"
-            console.log("currentMonthString",currentMonthString)
+            const balanceResults = await searchBalance(connection, user_id, goal.subject_id, startyear, endyear);
+        
+            console.log("balanceResults", balanceResults);
+        
             const balanceData = balanceResults[0];
-            
-            // 找到當前月份的資料以獲取當前餘額
-            const currentBalance = balanceData.find(b => b.month === currentMonthString) || { amount: 0 };
-            
-            // 过滤掉当前月份
-            const historyData = balanceData.filter(b => b.month !== currentMonthString);
-            
+        
+            let yearlyHistory = JSON.parse(JSON.stringify(historyTemplate));
+        
+            balanceData.forEach(b => {
+                const year = b.month.getFullYear().toString();
+                const month = b.month.getMonth(); // 從0開始計算的月份
+        
+                const targetYear = yearlyHistory.find(y => y.label === year);
+                if (targetYear) {
+                    targetYear.data[month] = b.amount;
+                }
+            });
+        
             goals.push({
                 id: goal.id,
                 subject_id: goal.subject_id,
                 name: goal.name,
                 amount: goal.amount,
-                current_amount: currentBalance.amount, // 使用找到的當前餘額
-                history_amount: historyData.map(b => {
-                    return {
-                        month: b.month.toISOString().slice(0, 7),
-                        amount: b.amount
-                    }
-                })
-            });}
-           
-            return { data: { goals } };
+                current_amount: balanceData.find(b => b.month.getMonth() === new Date().getMonth() && b.month.getFullYear() === new Date().getFullYear())?.amount || 0,
+                history_amount: yearlyHistory
+            });
+        }
+
+        return { data: { goals } };
     } catch (err) {
         console.error("Failed to get goals:", err);
         throw err;
@@ -199,7 +204,6 @@ async function getGoal (user_id, inputDate, duration) {
         }
     }
 }
-
 
 
 

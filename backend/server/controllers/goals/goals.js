@@ -79,10 +79,14 @@ async function goalDelete (req, res) {
 async function goalGet (req, res) {
     try {
         const user_id = req.user.id;
-        const inputDate = new Date();
-        const duration = req.body.duration
+        const startyear =parseInt(req.query.startyear);
+        const endyear = parseInt(req.query.endyear);
+        // console.log("req.query:", req.query);
+        // console.log(typeof startyear, typeof endyear);
+
+
     
-        const data = await getGoal(user_id, inputDate, duration);
+        const data = await getGoal(user_id, startyear, endyear);
         return res.status(200).json(data);
 
     } catch (err) {
@@ -99,7 +103,7 @@ async function goalGet (req, res) {
 router.post('/', checkAuthorization, checkContentType(), checkBody(toCheck_goalSet), goalSet);
 router.put('/:id', checkAuthorization, checkContentType(), checkBody(toCheck_goalUpdate),  goalUpdate);
 router.delete('/:id', checkAuthorization, checkContentType(),  goalDelete);
-router.get('/', checkAuthorization, checkContentType(),  goalGet);
+router.get('/', checkAuthorization,  goalGet);
 
 module.exports = router;
 
