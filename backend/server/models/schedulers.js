@@ -57,7 +57,7 @@ async function depreciatingUpdateBalances(client, register, month, codes){
     }
 }
 
-async function depreciate(){
+async function depreciate(year=null, month=null){
     const client = new SqlClient();
     await client.connect();
 
@@ -66,8 +66,11 @@ async function depreciate(){
     const a_codes = getRelatedIds(a_code);
     const l_codes = getRelatedIds(l_code);
 
-    const [yaer, month] = new Date().toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' }).split('/');
-    const timestamp = `${yaer}/${month}/1`;
+    if (!year && !month)
+        [year, month] = new Date().toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' }).split('/');
+    
+    const timestamp = `${year}/${month}/28`;
+    const date = `${year}/${month}/1`;
 
     try{
         // get registers list
@@ -91,7 +94,7 @@ async function depreciate(){
                 await Promise.all([
                     depreciatingUpdateRegisters(client, register),
                     depreciatingInsertEntries(client, register, timestamp, code),
-                    depreciatingUpdateBalances(client, register, timestamp, codes)
+                    depreciatingUpdateBalances(client, register, date, codes)
                 ])
                 await client.commit();
             }catch(err){
@@ -113,34 +116,52 @@ async function depreciate(){
 } 
 
 // copyBalances 
-async function copyBalances(){
+async function copyBalances(year=null, month=null){
 
     const client = new SqlClient();
     await client.connect();
 
-    const [yaer, month] = new Date().toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' }).split('/');
-    const thisMonth = `${yaer}/${month}/1`
-    const lastMonth = month==1 ? `${yaer-1}/12/1` : `${yaer}/${month-1}/1`
+    if (!year && !month){
+        [year, month] = new Date().toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' }).split('/');
+    }
+    const thisMonth = `${year}/${month}/1`
+    const lastMonth = month==1 ? `${year-1}/12/1` : `${year}/${month-1}/1`
 
     try{
         await client.transaction();
 
         let query = `
+            -- 臨時表1
             CREATE TEMPORARY TABLE temp_table AS (
                 SELECT user_id, subject_id, amount, month from balances
                 WHERE month=?
             );
             
-            UPDATE temp_table SET month=?;
-            UPDATE temp_table SET amount=0 WHERE subject_id>=4000;
+            -- 臨時表2
+            CREATE TEMPORARY TABLE temp_table_2 AS (
+                SELECT user_id, amount
+                FROM temp_table
+                WHERE subject_id=3200
+            );
             
             -- 將當期損益移至保留盈餘
             UPDATE temp_table AS t1
-            JOIN temp_table AS t2 ON t1.user_id = t2.user_id
+            JOIN temp_table_2 AS t2 ON t1.user_id = t2.user_id
             SET t1.amount = t2.amount, t2.amount = 0
-            WHERE t1.subject_id = 3100 AND t2.subject_id = 3200;
+            WHERE t1.subject_id = 3100;
 
+            -- 損益歸零
+            UPDATE temp_table SET amount=0 WHERE subject_id>=3200;
+
+            -- 更新月份
+            UPDATE temp_table SET month=?;
+            
+            -- 插入餘額
             INSERT INTO balances SELECT user_id, subject_id, amount, month FROM temp_table;
+            
+            -- 清除臨時表
+            DROP TEMPORARY TABLE temp_table;
+            DROP TEMPORARY TABLE temp_table_2;
             `
         let values = [lastMonth, thisMonth];
 
