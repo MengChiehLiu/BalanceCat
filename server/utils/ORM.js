@@ -62,8 +62,8 @@ class SqlClient{
     }; 
 
     // operations
-    select(table, columns=['*']){
-        this._query += `SELECT ${columns.join(', ')} FROM ${table} `
+    select(table, columns='*'){
+        this._query += `SELECT ${columns} FROM ${table} `
         return this
     };
 
@@ -92,7 +92,18 @@ class SqlClient{
         const questions = Array(keys.length).fill('?').join(', ');
         this._query += `INSERT INTO ${table} (${keys.join(', ')}) VALUES (${questions}) `;
         this.values.push(...Object.values(dict));
-        return this
+        return this;
+    };
+
+    insertColumns(table, columns){
+        this._query +=  `INSERT INTO ${table} (${columns}) VALUES `
+        return this;
+    }
+
+    insertValues(values){
+        this._query += `?`;
+        this.values.push(values);
+        return this;
     };
 
     update(table, dict){
@@ -123,13 +134,31 @@ class SqlClient{
     order(column){
         this._query += `ORDER BY ${column} `;
         return this;
+    };
+
+    group(column){
+        this._query += `GROUP BY ${column} `;
+        return this;
+    };
+
+    union(){
+        this._query += `UNION `;
+        return this;
+    };
+
+    next_line(){
+        this._query += `; `;
+        return this;
     }
 
-
-    async query(){
-        return await this.client.query(this._query, this.values)
+    async query(query, values){
+        if (query && values) return await this.client.query(query, values)
+        else return await this.client.query(this._query, this.values)
     };
 };
 
-module.exports = SqlClient;
+module.exports = {
+    SqlClient: SqlClient, 
+    pool: pool
+};
 

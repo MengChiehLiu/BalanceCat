@@ -34,14 +34,31 @@ function checkBody(fields){
     return function(req, res, next){
         const body = req.body;
         for (let field of fields)
-            if (!body[field]) return res.status(401).json({error: `Request Body Imcomplete: ${field} not found`});
+            if (body[field] === undefined) return res.status(401).json({error: `Request Body Imcomplete: ${field} not found`});
         next();
     };
 };
  
+// 檢查 timestamp 格式
+function checkTimestampFormat(req, res, next) {
+    const timestamp = req.query.timestamp;
+
+    // 檢查 timestamp 是否存在
+    if (!timestamp) return next();  // 若不存在則進入下一 middleware，您也可以選擇返回錯誤
+    
+    // 使用正則表達式檢查日期格式是否為 YYYY-MM-DD
+    const pattern = /^\d{4}-\d{2}-\d{2}$/;
+
+    if (!pattern.test(timestamp)) {
+        return res.status(400).json({error: "Invalid timestamp format. Expected format: YYYY-MM-DD."});
+    }
+
+    next();  // 若格式正確，進入下一 middleware
+};
 
 module.exports = {
     checkContentType: checkContentType,
     checkAuthorization: checkAuthorization,
-    checkBody: checkBody
+    checkBody: checkBody,
+    checkTimestampFormat: checkTimestampFormat
 };
