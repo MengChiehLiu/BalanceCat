@@ -174,12 +174,10 @@ async function getEntryHistory(user_id, subject_id, start, end){
             .select('e', toSelect)
             .join('entryDetails as ed', 'e.id=ed.entry_id')
             .join('subjects as s', 's.id=ed.subject_id')
-            .group('id')
-            .order('timestamp DESC, amount')
-        
+
         if (subject_id) client.where({'s.id=?': subject_id})
-            
-        const [entryHistory] = await client.query()
+        const [entryHistory] = await client.group('id').order('timestamp DESC, amount').query()
+    
         return entryHistory;
 
     }catch(err){
