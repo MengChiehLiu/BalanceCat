@@ -57,7 +57,7 @@ async function depreciatingUpdateBalances(client, register, month, codes){
     }
 }
 
-async function depreciate(){
+async function depreciate(year=null, month=null){
     const client = new SqlClient();
     await client.connect();
 
@@ -66,8 +66,11 @@ async function depreciate(){
     const a_codes = getRelatedIds(a_code);
     const l_codes = getRelatedIds(l_code);
 
-    const [year, month] = new Date().toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' }).split('/');
-    const timestamp = `${year}/${month}/1`;
+    if (!year && !month)
+        [year, month] = new Date().toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' }).split('/');
+    
+    const timestamp = `${year}/${month}/28`;
+    const date = `${year}/${month}/1`;
 
     try{
         // get registers list
@@ -91,7 +94,7 @@ async function depreciate(){
                 await Promise.all([
                     depreciatingUpdateRegisters(client, register),
                     depreciatingInsertEntries(client, register, timestamp, code),
-                    depreciatingUpdateBalances(client, register, timestamp, codes)
+                    depreciatingUpdateBalances(client, register, date, codes)
                 ])
                 await client.commit();
             }catch(err){
