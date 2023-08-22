@@ -1,0 +1,81 @@
+.wrapper {
+    width: 90%;
+    hr {
+        border: solid 1px #E7EAEE;
+    }
+    .title {
+        overflow: hidden;
+        color: var(--neutral-800, #191D23);
+        font-size: 30px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: normal;
+    }
+    .cat {
+        border-radius: 30%;
+        animation: bounce 2s infinite;
+        @keyframes bounce {
+            0%, 100% {
+              transform: translateY(0); /* 初始和結束狀態為不移動 */
+            }
+            50% {
+              transform: translateY(-20px); /* 中間狀態為向上移動 */
+            }
+          }
+    }
+    
+    .buttons{
+        display: flex;
+        flex-direction: row;
+
+        button {
+            border: 1px solid #d9d9d9;
+            padding: 0.3rem 1.3rem;
+            border-radius: 15px;
+            background: none;
+            margin-right: 0.5rem;
+            cursor: pointer;
+        }
+        .blueButton {
+            background-color: #047857;
+            color: #fff;
+        }
+    }
+    
+    .table {
+        .titleBar {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
+            p {
+                width: 8rem;
+                text-align: center;
+                color: var(--neutral-800, #191D23);
+            }
+            #none {
+                opacity: 0;
+            }
+        }
+    }
+    .catBar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .cat {
+            margin-right: 1rem;
+        }
+        .dialog {
+            border-radius: 30px;
+            background-color: #448af7;
+            padding: 1rem 3rem;
+            position: relative;
+            color: #fff;
+            .leg {
+                position:absolute;
+                top: 1.9rem;
+                left: 0;
+            }
+        }
+    }
+}

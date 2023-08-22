@@ -1,0 +1,29 @@
+name: BalanceCat
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: SSH into EC2 instance and deploy services
+              run: |
+                echo "${{ secrets.EC2_PRIVATE_KEY  }}" > private_key && chmod 600 private_key
+                ssh -o StrictHostKeyChecking=no -i private_key ${{ secrets.EC2_USERNAME  }}@${{ secrets.EC2_HOST  }} '
+                    cd /home/ubuntu/BalanceCat &&
+                    git pull origin develop &&
+                    echo "${{ secrets.FRONTEND_ENV_FILE  }}" > frontend/.env &&
+                    echo "${{ secrets.BACKEND_ENV_FILE  }}" > backend/.env &&
+                    echo "${{ secrets.COMBINED_CRT  }}" > private/combined.crt &&
+                    echo "${{ secrets.PRIVATE_KEY  }}" > private/private.key &&
+                    sudo docker-compose down &&
+                    sudo docker-compose up --build -d &&
+                    yes | sudo docker system prune &&
+                    yes | sudo docker volume prune
+                '
