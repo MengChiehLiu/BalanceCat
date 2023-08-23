@@ -11,7 +11,7 @@ async function lastUpdate(client, user_id, timestamp){
         const values = [timestamp, user_id]
         await client.query(query, values)
     }catch(err){
-        console.log(err)
+        console.error(err)
         throw 'lastUpdate fail'
     }
 }

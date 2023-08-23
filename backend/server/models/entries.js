@@ -16,7 +16,7 @@ async function insertEntryDetails(client, entry_id, details){
         return;
 
     }catch(err){
-        console.log('insertEntryDetails fail')
+        console.error('[insertEntryDetails] fail: ')
         throw err
     }
 }
@@ -105,7 +105,7 @@ async function deletingAnEntryWithId(client, entry_id){
         await client.query(query, values);
         return ;
     }catch(err){
-        console.log('deletingAnEntryWithId fail.');
+        console.error('[deletingAnEntryWithId] fail:');
         throw err
     }
 }
@@ -114,27 +114,37 @@ async function deleteAnEntry(user_id, entry_id){
     client = new SqlClient();
     await client.connect();
 
+    const toSelect = `
+        e.id, DATE_FORMAT(e.timestamp, '%Y-%m-01') AS month, e.parent_id, 
+        JSON_ARRAYAGG(
+            JSON_OBJECT(
+                "subject_id", ed.subject_id,
+                "amount", (ed.amount*-1)
+            )
+        ) AS details
+    `
+
     try{
-        const [entry] = await client
-            .select('entries', `id, DATE_FORMAT(timestamp, '%Y-%m-01') AS month, parent_id`)
-            .where({'user_id=?': user_id, 'id=?': entry_id})
+        const [entries] = await client
+            .select('entries as e', toSelect)
+            .join('entryDetails as ed', 'e.id=ed.entry_id')
+            .where({'e.user_id=?': user_id}, {'e.id=?': entry_id, 'e.parent_id=?': entry_id})
+            .group('e.id')
+            .order('timestamp DESC')
             .query()
 
-        if (entry.length===0) throw new CustomError("Invalid access.")
-        if (entry[0].parent_id) throw new CustomError("Cannot delete child entry, operate on parent entry instead.")
+        if (entries.length===0) throw new CustomError("Invalid access.")
+        if (entries[entries.length-1].parent_id) throw new CustomError("Cannot delete child entry, operate on parent entry instead.")
         client.clear();
         
-        const month = entry[0].month
-        const [details] = await client
-            .select('entryDetails', 'subject_id, (amount*-1) AS amount')
-            .where({'entry_id=?': entry_id})
-            .query()
-            
+
         await client.transaction();
-        await Promise.all([
-            deletingAnEntryWithId(client, entry_id),
-            updateBalances(client, user_id, month, details)
-        ])
+        for (const entry of entries){
+            await Promise.all([
+                deletingAnEntryWithId(client, entry.id),
+                updateBalances(client, user_id, entry.month, entry.details)
+            ])
+        }   
         await client.commit();
     
     }catch(err){
@@ -174,12 +184,10 @@ async function getEntryHistory(user_id, subject_id, start, end){
             .select('e', toSelect)
             .join('entryDetails as ed', 'e.id=ed.entry_id')
             .join('subjects as s', 's.id=ed.subject_id')
-            .group('id')
-            .order('timestamp DESC, amount')
-        
+
         if (subject_id) client.where({'s.id=?': subject_id})
-            
-        const [entryHistory] = await client.query()
+        const [entryHistory] = await client.group('id').order('timestamp DESC, amount').query()
+    
         return entryHistory;
 
     }catch(err){

@@ -20,7 +20,7 @@ async function goalSet (req, res) {
         return res.status(200).json({data:{goal:{id:goal_id}}});
 
     } catch (err) {
-        console.log(err);
+        console.error(err);
 
         // Check if the error is because the goal already exists
         if (err.message === "Goal already existed") {
@@ -43,7 +43,7 @@ async function goalUpdate (req, res) {
         return res.status(200).json({data:{goal:{id:goal_id}}});
 
     } catch (err) {
-        console.log(err);
+        console.error(err);
 
         // Check specific error messages and respond accordingly
         if (err.message === "No rows were updated") {
@@ -64,7 +64,7 @@ async function goalDelete (req, res) {
         return res.status(200).json({data:{goal:{id:goal_id}}});
 
     } catch (err) {
-        console.log(err);
+        console.error(err);
 
         // Check specific error messages and respond accordingly
         if (err.message === "No rows were deleted") {
@@ -79,14 +79,18 @@ async function goalDelete (req, res) {
 async function goalGet (req, res) {
     try {
         const user_id = req.user.id;
-        const inputDate = new Date();
-        const duration = parseInt(req.query.duration, 10);
+        const startyear =parseInt(req.query.startyear);
+        const endyear = parseInt(req.query.endyear);
+        // console.log("req.query:", req.query);
+        // console.log(typeof startyear, typeof endyear);
+
+
     
-        const data = await getGoal(user_id, inputDate, duration);
+        const data = await getGoal(user_id, startyear, endyear);
         return res.status(200).json(data);
 
     } catch (err) {
-        console.log(err);
+        console.error(err);
         return res.status(500).json({error: 'Internal Server Error'});
     }
 }
@@ -99,8 +103,7 @@ async function goalGet (req, res) {
 router.post('/', checkAuthorization, checkContentType(), checkBody(toCheck_goalSet), goalSet);
 router.put('/:id', checkAuthorization, checkContentType(), checkBody(toCheck_goalUpdate),  goalUpdate);
 router.delete('/:id', checkAuthorization, checkContentType(),  goalDelete);
-router.get('/', checkAuthorization, goalGet);
+router.get('/', checkAuthorization,  goalGet);
 
 module.exports = router;
-
 

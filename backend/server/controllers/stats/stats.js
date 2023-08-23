@@ -16,7 +16,7 @@ async function routerGetOverall(req, res){
         const [stats, charts] = await getStatsCharts(user_id, statCodes, chartCodes)
         return res.json({data: {stats: stats, charts: charts}})
     }catch(err){
-        console.log(err);
+        console.error(err);
         return res.status(500).json({error: 'Internal Server Error'});
     };
 };
@@ -34,7 +34,7 @@ async function routerGetExpenses(req, res){
         const [stats, charts] = await getStatsCharts(user_id, statCodes, chartCodes)
         return res.json({data: {stats: stats, charts: charts}})
     }catch(err){
-        console.log(err);
+        console.error(err);
         return res.status(500).json({error: 'Internal Server Error'});
     };
 };

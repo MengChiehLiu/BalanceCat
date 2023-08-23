@@ -3,12 +3,18 @@
       {
         "name": "express-app",
         "script": "app.js",
-        "autorestart": true
+        "autorestart": true,
+        "env": {
+          "NODE_ENV": "production"
+        }
       },
       {
         "name": "schedulers",
         "script": "schedulers.js",
-        "autorestart": true
+        "autorestart": true,
+        "env": {
+          "NODE_ENV": "production"
+        }
       }
     ]
   }

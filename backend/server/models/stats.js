@@ -23,7 +23,7 @@ async function gettingStats(client, user_id, thisMonth, lastMonth, codes){
         return stats
 
     }catch(err){
-        console.log('gettingStats fail')
+        console.error('gettingStats fail')
         throw err
     }
 }
@@ -43,7 +43,7 @@ async function gettingCharts(client, user_id, thisMonth, codes){
         return charts
 
     }catch(err){
-        console.log('gettingCharts fail')
+        console.error('gettingCharts fail')
         throw err
     }
 }

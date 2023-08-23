@@ -114,29 +114,43 @@ async function deleteGoal(id, user_id){
     }
 }
 
-async function searchBalance(connection, user_id, subject_id, startMonth, currentMonth) {
+async function searchBalance(connection, user_id, subject_id, startYear, endYear) {
+    console.log("searchBalance parameters:", user_id, subject_id, startYear, endYear);
     const query = `
         SELECT * 
         FROM balances
-        WHERE user_id = ? AND subject_id = ? AND month BETWEEN ? AND ?
+        WHERE user_id = ? AND subject_id = ? AND YEAR(month) BETWEEN ? AND ?
         ORDER BY month DESC
     `;
-    return await connection.query(query, [user_id, subject_id, startMonth, currentMonth]);
+    return await connection.query(query, [user_id, subject_id, startYear, endYear]);
 }
 
-async function getGoal (user_id, inputDate, duration) {
+
+function getLastNMonths(startyear, endyear) {
+    let years = [];
+    for (let y = endyear; y >= startyear; y--) {
+        years.push({
+            label: y.toString(),
+            data: new Array(12).fill(0)
+        });
+    }
+    return years;
+}
+
+
+async function getGoal(user_id, startyear, endyear) {
+    // console.log("startyear in getGoal",startyear)
+    // console.log("endyear in getGoal",endyear)
     // Database
     let connection;
-    try{
+    try {
         connection = await pool.getConnection();
-    } catch(err) {
-        console.error("Failed to get connection:",err);
-        throw(err)
+    } catch (err) {
+        console.error("Failed to get connection:", err);
+        throw (err)
     }
 
-    // getGoal 
     try {
-
         const goalsQuery = `
         SELECT g.id, s.name, g.subject_id, g.amount  
         FROM goals g
@@ -144,55 +158,43 @@ async function getGoal (user_id, inputDate, duration) {
         WHERE user_id = ?
         `;
         const goalsResults = await connection.query(goalsQuery, [user_id]);
-        console.log("goalsResults:", goalsResults);
         
-        // 计算时间范围
-        const startMonth = new Date(inputDate);
-        if (duration) {
-            startMonth.setUTCMonth(startMonth.getUTCMonth() - duration);
-        } else {
-            startMonth.setUTCMonth(startMonth.getUTCMonth() - 24);
-        }
-        startMonth.setUTCDate(1);
-        console.log("startMonth",startMonth)
+        // 設置歷史模板
+        const historyTemplate = getLastNMonths(startyear, endyear);
 
-        const endMonth = new Date(inputDate);
-        endMonth.setUTCDate(1);  // 设置为每个月的第一天
-        console.log("endMonth",endMonth)     
-    
-        const endYear = endMonth.getUTCFullYear();
-        const startYear = startMonth.getUTCFullYear();
-
-        // Initialize years data structure
-        let yearData = {};
-        for (let y = startYear; y <= endYear; y++) {
-            yearData[y] = Array(12).fill(0);  // initialize all months with 0
-        }
+        let goals = [];
 
         for (let i = 0; i < goalsResults[0].length; i++) {
             const goal = goalsResults[0][i];
-            const balanceResults = await searchBalance(connection, user_id, goal.subject_id, startMonth, endMonth);
+            const balanceResults = await searchBalance(connection, user_id, goal.subject_id, startyear, endyear);
+        
+            console.log("balanceResults", balanceResults);
+        
             const balanceData = balanceResults[0];
-
-            // Map each balance to its respective month in the year structure
-            for (const balance of balanceData) {
-                const date = new Date(balance.month); // assuming balance.month is a string in format YYYY-MM
-                const year = date.getUTCFullYear();
-                const month = date.getUTCMonth();  // returns 0-11
-                yearData[year][month] = balance.amount;
-            }
-        }
-
-        // Convert yearData to the desired output format
-        let output = [];
-        for (const [year, months] of Object.entries(yearData)) {
-            output.push({
-                data: months,
-                label: parseInt(year)
+        
+            let yearlyHistory = JSON.parse(JSON.stringify(historyTemplate));
+        
+            balanceData.forEach(b => {
+                const year = b.month.getFullYear().toString();
+                const month = b.month.getMonth(); // 從0開始計算的月份
+        
+                const targetYear = yearlyHistory.find(y => y.label === year);
+                if (targetYear) {
+                    targetYear.data[month] = b.amount;
+                }
+            });
+        
+            goals.push({
+                id: goal.id,
+                subject_id: goal.subject_id,
+                name: goal.name,
+                amount: goal.amount,
+                current_amount: balanceData.find(b => b.month.getMonth() === new Date().getMonth() && b.month.getFullYear() === new Date().getFullYear())?.amount || 0,
+                history_amount: yearlyHistory
             });
         }
 
-        return { data: { series: output } };
+        return { data: { goals } };
     } catch (err) {
         console.error("Failed to get goals:", err);
         throw err;
@@ -202,7 +204,6 @@ async function getGoal (user_id, inputDate, duration) {
         }
     }
 }
-
 
 
 
