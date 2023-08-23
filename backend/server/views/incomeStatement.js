@@ -1,5 +1,6 @@
 const router = require('express').Router();
 
-router.use('/', require('../controllers/registers.js'));
+router.get('/', require('../controllers/is.js'));
+
 
 module.exports = router;

@@ -1,10 +1,10 @@
 const router = require('express').Router();
 
 // import middlewares
-const {checkAuthorization} = require('../../utils/checkRequest');
+const {checkAuthorization} = require('../utils/checkRequest');
 
 // import models
-const {getRegisters} = require('../../models/registers');
+const {getRegisters} = require('../models/registers');
 
 async function routerGet(req, res){
     try{
