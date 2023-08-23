@@ -1,10 +1,10 @@
 const router = require('express').Router();
 
 // import middlewares
-const {checkAuthorization, checkDateFormat} = require('../utils/checkRequest');
+const {checkAuthorization, checkDateFormat} = require('../../utils/checkRequest');
 
 // import models
-const {getFS} = require('../models/fs');
+const {getFS} = require('../../models/fs');
 
 async function routerGet(req, res){
     try{
