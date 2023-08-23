@@ -1,7 +1,7 @@
 const router = require('express').Router();
 
 // import models
-const {dataInitDB} = require('../../models/data');
+const {dataInitDB} = require('../models/data');
 
 /**
  * @swagger
