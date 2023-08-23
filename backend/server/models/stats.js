@@ -14,11 +14,12 @@ async function gettingStats(client, user_id, thisMonth, lastMonth, codes){
         SELECT 
             b1.name, b1.amount, 
             ((b1.amount-b2.amount)/NULLIF(b2.amount, 0)*100) AS percentage_change 
-        FROM b1 LEFT 
-        JOIN b1 as b2 ON b1.id=b2.id AND b1.month > b2.month
+        FROM b1 
+        LEFT JOIN b1 as b2 ON b1.id=b2.id AND b1.month > b2.month
+        WHERE b1.month=?
         ORDER BY b1.id
         `
-        const values = [user_id, codes, [thisMonth, lastMonth]]
+        const values = [user_id, codes, [thisMonth, lastMonth], thisMonth]
         const [stats] = await client.query(query, values)
         return stats
 
