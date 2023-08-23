@@ -14,7 +14,7 @@ async function dataInitDB(){
         console.error(err);
         await client.rollback();
     }finally{
-        client.close();
+        await client.close();
     }
 };
 

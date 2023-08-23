@@ -70,7 +70,7 @@ async function getStatsCharts(user_id, statCodes, chartCodes){
         throw err
 
     }finally{
-        client.close();
+        await client.close();
     }
 }
 

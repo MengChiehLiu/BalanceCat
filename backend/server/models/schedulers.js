@@ -111,7 +111,7 @@ async function depreciate(year=null, month=null){
         throw new Error('schedulers: depreciate fail')
 
     }finally{
-        client.close();
+        await client.close();
     }
 } 
 
@@ -176,7 +176,7 @@ async function copyBalances(year=null, month=null){
         throw new Error('schedulers: copyBalances fail')
 
     }finally{
-        client.close();
+        await client.close();
     }
 }
 

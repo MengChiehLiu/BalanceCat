@@ -22,7 +22,7 @@ async function getFS(user_id, date){
         throw err;
 
     }finally{
-        client.close();
+        await client.close();
     }
 }
 
