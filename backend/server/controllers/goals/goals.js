@@ -100,11 +100,11 @@ async function goalGet (req, res) {
 
 
 
+
 router.post('/', checkAuthorization, checkContentType(), checkBody(toCheck_goalSet), goalSet);
 router.put('/:id', checkAuthorization, checkContentType(), checkBody(toCheck_goalUpdate),  goalUpdate);
 router.delete('/:id', checkAuthorization, checkContentType(),  goalDelete);
 router.get('/', checkAuthorization,  goalGet);
 
 module.exports = router;
-
 

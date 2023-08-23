@@ -4,19 +4,6 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 
-// user's latest update time
-async function lastUpdate(client, user_id, timestamp){
-    try{
-        const query = `UPDATE users SET last_updated=GREATEST(?, last_updated) WHERE id=?`
-        const values = [timestamp, user_id]
-        await client.query(query, values)
-    }catch(err){
-        console.error(err)
-        throw 'lastUpdate fail'
-    }
-}
-
-
 // 密鑰
 const secretKey = process.env.secretKey; 
 
@@ -94,7 +81,7 @@ async function insertZeroAmountForAllSubjects(connection, user_id, month) {
 
 
 // Signup
-async function signUpUsers(name, email, password, last_updated) {
+async function signUpUsers(name, email, password) {
     let connection;
     try {
         connection = await pool.getConnection();
@@ -109,7 +96,7 @@ async function signUpUsers(name, email, password, last_updated) {
     // Signup
     try {
         const query = `
-            INSERT INTO users (name, email, password, last_updated)  VALUES (?, ?, ?, ?)
+            INSERT INTO users (name, email, password)  VALUES (?, ?, ?)
         `;
 
         // check email format
@@ -129,7 +116,7 @@ async function signUpUsers(name, email, password, last_updated) {
         const hashedPassword = await bcrypt.hash(password, 10); // 使用 bcrypt 對密碼進行加密
 
         // 將使用者資料放到資料庫中
-        const result = await connection.query(query, [name, email, hashedPassword, last_updated]);
+        const result = await connection.query(query, [name, email, hashedPassword]);
         const userId = result[0].insertId;
 
 
@@ -137,7 +124,7 @@ async function signUpUsers(name, email, password, last_updated) {
         const userData = await findUserById(connection, userId);
 
         // 更新balances
-        const yearAndMonth = last_updated.toISOString().slice(0, 7) + "-01";
+        const yearAndMonth = new Date().toISOString().slice(0, 7) + "-01";
         await insertZeroAmountForAllSubjects(connection, userId, yearAndMonth)
 
         // 生成 Access Token
@@ -301,7 +288,6 @@ async function getUserInfo(user_id){
 module.exports = { 
   signUpUsers: signUpUsers,
   signInUsers: signInUsers,
-  lastUpdate: lastUpdate,
   updateUserPicture: updateUserPicture,
   updateUserMemo: updateUserMemo,
   getUserInfo: getUserInfo

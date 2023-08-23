@@ -21,11 +21,10 @@ async function usersSignUp (req, res){
         const email = req.body.email
         const name = req.body.name
         const password = req.body.password
-        const last_updated = new Date()
 
-        console.log([email, name, password, last_updated])
+        console.log([email, name, password])
     
-        const userData = await signUpUsers (name, email, password, last_updated)
+        const userData = await signUpUsers (name, email, password)
     
         return res.status(200).json({data:userData})
 

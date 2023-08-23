@@ -2,6 +2,230 @@ const { pool } = require('../utils/ORM');
 
 const { buildHierarchyIS } = require('../utils/others');
 
+const defaultData = {
+    "data": {
+        "subjects": [
+            {
+                "id": 4000,
+                "name": "收入",
+                "is_debit": 0,
+                "amount": 0,
+                "subjects": [
+                    {
+                        "id": 4100,
+                        "name": "經常性收入",
+                        "is_debit": 0,
+                        "amount": 0,
+                        "subjects": [
+                            {
+                                "id": 4101,
+                                "name": "薪資收入",
+                                "is_debit": 0,
+                                "amount": 0,
+                                "subjects": null
+                            },
+                            {
+                                "id": 4102,
+                                "name": "利息收入",
+                                "is_debit": 0,
+                                "amount": 0,
+                                "subjects": null
+                            },
+                            {
+                                "id": 4103,
+                                "name": "其他",
+                                "is_debit": 0,
+                                "amount": 0,
+                                "subjects": null
+                            }
+                        ]
+                    },
+                    {
+                        "id": 4200,
+                        "name": "非經常性收入",
+                        "is_debit": 0,
+                        "amount": 0,
+                        "subjects": [
+                            {
+                                "id": 4201,
+                                "name": "兼職收入",
+                                "is_debit": 0,
+                                "amount": 0,
+                                "subjects": null
+                            },
+                            {
+                                "id": 4202,
+                                "name": "中獎收入",
+                                "is_debit": 0,
+                                "amount": 0,
+                                "subjects": null
+                            },
+                            {
+                                "id": 4203,
+                                "name": "其他",
+                                "is_debit": 0,
+                                "amount": 0,
+                                "subjects": null
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": 5000,
+                "name": "支出",
+                "is_debit": 1,
+                "amount": 0,
+                "subjects": [
+                    {
+                        "id": 5100,
+                        "name": "經常性支出",
+                        "is_debit": 1,
+                        "amount": 0,
+                        "subjects": [
+                            {
+                                "id": 5101,
+                                "name": "伙食支出",
+                                "is_debit": 1,
+                                "amount": 0,
+                                "subjects": null
+                            },
+                            {
+                                "id": 5102,
+                                "name": "治裝支出",
+                                "is_debit": 1,
+                                "amount": 0,
+                                "subjects": null
+                            },
+                            {
+                                "id": 5103,
+                                "name": "住房支出",
+                                "is_debit": 1,
+                                "amount": 0,
+                                "subjects": null
+                            },
+                            {
+                                "id": 5104,
+                                "name": "交通支出",
+                                "is_debit": 1,
+                                "amount": 0,
+                                "subjects": null
+                            },
+                            {
+                                "id": 5105,
+                                "name": "教育支出",
+                                "is_debit": 1,
+                                "amount": 0,
+                                "subjects": null
+                            },
+                            {
+                                "id": 5106,
+                                "name": "娛樂支出",
+                                "is_debit": 1,
+                                "amount": 0,
+                                "subjects": null
+                            },
+                            {
+                                "id": 5107,
+                                "name": "孝親費",
+                                "is_debit": 1,
+                                "amount": 0,
+                                "subjects": null
+                            },
+                            {
+                                "id": 5108,
+                                "name": "折舊費用",
+                                "is_debit": 1,
+                                "amount": 0,
+                                "subjects": null
+                            },
+                            {
+                                "id": 5109,
+                                "name": "其他",
+                                "is_debit": 1,
+                                "amount": 0,
+                                "subjects": null
+                            }
+                        ]
+                    },
+                    {
+                        "id": 5200,
+                        "name": "非經常性支出",
+                        "is_debit": 1,
+                        "amount": 0,
+                        "subjects": [
+                            {
+                                "id": 5201,
+                                "name": "伙食支出",
+                                "is_debit": 1,
+                                "amount": 0,
+                                "subjects": null
+                            },
+                            {
+                                "id": 5202,
+                                "name": "治裝支出",
+                                "is_debit": 1,
+                                "amount": 0,
+                                "subjects": null
+                            },
+                            {
+                                "id": 5203,
+                                "name": "住房支出",
+                                "is_debit": 1,
+                                "amount": 0,
+                                "subjects": null
+                            },
+                            {
+                                "id": 5204,
+                                "name": "交通支出",
+                                "is_debit": 1,
+                                "amount": 0,
+                                "subjects": null
+                            },
+                            {
+                                "id": 5205,
+                                "name": "教育支出",
+                                "is_debit": 1,
+                                "amount": 0,
+                                "subjects": null
+                            },
+                            {
+                                "id": 5206,
+                                "name": "娛樂支出",
+                                "is_debit": 1,
+                                "amount": 0,
+                                "subjects": null
+                            },
+                            {
+                                "id": 5207,
+                                "name": "孝親費",
+                                "is_debit": 1,
+                                "amount": 0,
+                                "subjects": null
+                            },
+                            {
+                                "id": 5208,
+                                "name": "折舊費用",
+                                "is_debit": 1,
+                                "amount": 0,
+                                "subjects": null
+                            },
+                            {
+                                "id": 5209,
+                                "name": "其他",
+                                "is_debit": 1,
+                                "amount": 0,
+                                "subjects": null
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+};
+
+
 async function getIncomeStatementData(userId, inputDate) {
     let connection;
     try {
@@ -11,56 +235,41 @@ async function getIncomeStatementData(userId, inputDate) {
         throw err;
     }
 
-    // 如果inputDate是字符串，直接转换为日期对象
-    const startDate = new Date(Date.UTC(inputDate.getFullYear(), inputDate.getMonth(), 1)); // 使用 Date.UTC 创建日期
-    const endDate = inputDate; // endDate 就是您的 inputDate
-    
-    // console.log(startDate.toISOString());
-    // console.log(endDate.toISOString());
-
     try {
         const query = `
-                WITH EntrySummary AS (
-                    SELECT 
-                        ed.subject_id,
-                        COALESCE(SUM(ed.amount), 0) as total_amount
-                    FROM entryDetails ed
-                    JOIN entries e ON ed.entry_id = e.id
-                    WHERE e.timestamp >= ? 
-                    AND e.timestamp < ? 
-                    AND e.user_id = ?
-                    GROUP BY ed.subject_id
-                )
-                
                 SELECT 
-                    s.id AS subject_id, 
+                    b.subject_id AS subject_id, 
                     s.name AS name, 
-                    COALESCE(es.total_amount, 0) AS amount,
+                    COALESCE(b.amount, 0) AS amount,
                     s.is_debit,
                     s.parent_id
-                FROM subjects s
-                LEFT JOIN EntrySummary es ON s.id = es.subject_id
-                WHERE s.id >= 4000
+                FROM balances b
+                LEFT JOIN subjects s ON b.subject_id = s.id
+                WHERE s.id >= 4000 AND user_id = ? AND month = ?  
                 ORDER BY s.id;
-            
             `;
 
-        const [results] = await connection.query(query, [startDate, endDate, userId]);
+        const [results] = await connection.query(query, [userId, inputDate]);
 
-        // Extract the relevant fields from each result item and create an array of objects
-        const subjects = results.map(result => ({
-            id: result.subject_id,
-            name: result.name,
-            amount: result.amount * (result.subject_id.toString().startsWith('4') ? -1 : 1), 
-            is_debit: result.is_debit,
-            parent_id: result.parent_id
-        }));
-        console.log("subjects",subjects)
-        
-        const hierarchy = buildHierarchyIS(subjects, null);
-        
+        // 如果查詢結果為空，返回預設的資料結構
+        if (results.length === 0) {
+            return defaultData;
+        } else {         
+            // Extract the relevant fields from each result item and create an array of objects
+            subjects = results.map(result => ({
+                id: result.subject_id,
+                name: result.name,
+                amount: result.amount * (result.subject_id.toString().startsWith('4') ? -1 : 1), 
+                is_debit: result.is_debit,
+                parent_id: result.parent_id
+            }));
+            console.log("subjects",subjects)
+            const hierarchy = buildHierarchyIS(subjects, null);
+            return { data: { subjects: hierarchy } };
+    
+        }
 
-        return hierarchy;
+
 
     } catch (err) {
         console.error("Failed to run query:", err);
