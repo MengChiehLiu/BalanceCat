@@ -9,7 +9,6 @@ CREATE TABLE users(
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     picture VARCHAR(255),
-    last_updated DATE NOT NULL,
     memo_title VARCHAR(255),
     memo_content VARCHAR(255)
 );
