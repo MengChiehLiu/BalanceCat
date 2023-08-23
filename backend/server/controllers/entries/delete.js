@@ -16,7 +16,7 @@ async function routerDelete(req, res){
         return res.json({data: {entry: {id: entry_id}}});
     }catch(err){
         if (err.name === 'CustomError') return res.status(400).json({error: err.message});
-        console.log(err);
+        console.error(err);
         return res.status(500).json({error: 'Internal Server Error'});
     }
 }
