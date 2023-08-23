@@ -8,12 +8,9 @@ async function getFS(user_id, date){
 
     try{
         let [fs] = await client
-            .select('balances')
-            .where({'user_id=?': user_id, 'month=?':date, 'subject_id<?':4000})
-            .as('b')
-
-            .select('b', 's.id, s.name, s.is_debit, s.parent_id, b.amount')
-            .join('subjects as s', 's.id=b.subject_id')
+            .select('subjects as s', 's.id, s.name, s.is_debit, s.parent_id, COALESCE(b.amount, 0) AS amount')
+            .join('balances as b', 's.id=b.subject_id')
+            .where({'s.id<?':4000, 'b.user_id=?': user_id, 'b.month=?':date})            
             .query()
         
         return buildHierarchyFS(fs, null)
