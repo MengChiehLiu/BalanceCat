@@ -7,13 +7,13 @@ router.get('/api/1.0', function(req, res){res.send('Hello World!');})
 router.use('/api/1.0/docs',  require('./swagger.js'));
 
 // routers
-router.use('/api/1.0/data', require('./data.js'));
-router.use('/api/1.0/entries', require('./entries.js'));
-router.use('/api/1.0/registers', require('./registers.js'));
-router.use('/api/1.0/fs', require('./fs.js'));
-router.use('/api/1.0/stats', require('./stats.js'));
-router.use('/api/1.0/goals', require('./goals.js'));
-router.use('/api/1.0/users', require('./users.js'));
+router.use('/api/1.0/data', require('../controllers/data.js'));
+router.use('/api/1.0/entries', require('../controllers/entries.js'));
+router.use('/api/1.0/registers', require('../controllers/registers.js'));
+router.use('/api/1.0/fs', require('../controllers/fs.js'));
+router.use('/api/1.0/stats', require('../controllers/stats.js'));
+router.use('/api/1.0/goals', require('../controllers/goals.js'));
+router.use('/api/1.0/users', require('../controllers/users.js'));
 
 
 module.exports = router;
