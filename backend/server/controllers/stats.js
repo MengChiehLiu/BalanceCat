@@ -1,10 +1,10 @@
 const router = require('express').Router();
 
 // import middlewares
-const {checkAuthorization} = require('../../utils/checkRequest');
+const {checkAuthorization} = require('../utils/checkRequest');
 
 // import models
-const {getStatsCharts} = require('../../models/stats');
+const {getStatsCharts} = require('../models/stats');
 
 
 async function routerGetOverall(req, res){
