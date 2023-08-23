@@ -6,13 +6,13 @@ require('dotenv').config();
 
 
 // import middlewares
-const {checkContentType, checkAuthorization, checkBody} = require('../../utils/checkRequest');
+const {checkContentType, checkAuthorization, checkBody} = require('../utils/checkRequest');
 const toCheck_usersSignUp = ['name','email','password']
 const toCheck_usersSignIn = ['email','password']
 const toCheck_memo = ['title', 'content']
 
 // import models
-const { signUpUsers, signInUsers, updateUserPicture, updateUserMemo, getUserInfo } = require('../../models/users')
+const { signUpUsers, signInUsers, updateUserPicture, updateUserMemo, getUserInfo } = require('../models/users')
 
 
 // Signup

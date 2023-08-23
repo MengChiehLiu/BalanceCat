@@ -29,7 +29,7 @@ async function findUserByEmail(connection, email){
 // findUserById
 async function findUserById(connection, id) {
     const query = `
-        SELECT id, name, email, last_updated FROM users WHERE id = ?
+        SELECT id, name, email FROM users WHERE id = ?
     `;
     const [rows] = await connection.query(query, [id]);
     //console.log("rows",rows)

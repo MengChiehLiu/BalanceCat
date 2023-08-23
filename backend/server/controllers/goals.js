@@ -1,12 +1,12 @@
 const router = require('express').Router();
 
 // import middlewares
-const {checkContentType, checkAuthorization, checkBody} = require('../../utils/checkRequest');
+const {checkContentType, checkAuthorization, checkBody} = require('../utils/checkRequest');
 const toCheck_goalSet = ['amount','subject_id']
 const toCheck_goalUpdate = ['amount']
 
 // import models
-const {setGoal,updateGoal,deleteGoal,getGoal} = require('../../models/goals.js')
+const {setGoal,updateGoal,deleteGoal,getGoal} = require('../models/goals.js')
 
 
 // set goals
