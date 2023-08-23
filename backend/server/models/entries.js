@@ -21,6 +21,22 @@ async function insertEntryDetails(client, entry_id, details){
     }
 }
 
+function checkDuplicate(details){
+    try{
+        const seenIds = new Set();
+        for (const detail of details) {
+            if (seenIds.has(detail.subject_id)) return true
+            seenIds.add(detail.subject_id);
+        }
+        return false;
+
+    }catch(err){
+        console.error('[checkEntryValidity] fail: ')
+        throw err
+    }
+    
+}
+
 // router functions
 async function getAnEntry(user_id, entry_id){
     client = new SqlClient();
@@ -65,6 +81,9 @@ async function getAnEntry(user_id, entry_id){
 }
 
 async function postAnEntry(user_id, details, timestamp, parent_id){
+
+    if (checkDuplicate(details)) throw new CustomError('Duplicate subjects is not allowed.')
+
     client = new SqlClient();
     await client.connect();
 
