@@ -8,7 +8,7 @@ async function getFS(user_id, date){
 
     try{
         let [fs] = await client
-            .select('subjects as s', 's.id, s.name, s.is_debit, s.parent_id, COALESCE(b.amount, 0)')
+            .select('subjects as s', 's.id, s.name, s.is_debit, s.parent_id, COALESCE(b.amount, 0) AS amount')
             .join('balances as b', 's.id=b.subject_id')
             .where({'s.id<?':4000, 'b.user_id=?': user_id, 'b.month=?':date})            
             .query()
