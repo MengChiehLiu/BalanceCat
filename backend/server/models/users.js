@@ -182,41 +182,47 @@ async function signInUsers(email, password) {
         throw err;
     }
 
+    try{
+        // 檢查email是否存在
+        const user = await findUserByEmail(connection, email);
+        if (!user) {
+            throw new Error("User not found");
+        }
+        //console.log("user", user)
 
-    // 檢查email是否存在
-    const user = await findUserByEmail(connection, email);
-    if (!user) {
-        throw new Error("User not found");
-    }
-    //console.log("user", user)
+        // 使用bcrypt進行密碼比對
+        const isValidPassword = await bcrypt.compare(password, user.password);
 
-    // 使用bcrypt進行密碼比對
-    const isValidPassword = await bcrypt.compare(password, user.password);
+        //console.log("isValidPassword",isValidPassword)
+        if (!isValidPassword) {
+            throw new Error("Invalid password");
+        }
 
-    //console.log("isValidPassword",isValidPassword)
-    if (!isValidPassword) {
-        throw new Error("Invalid password");
-    }
-
-    // 生成 Access Token
-    const userResponse = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-    };
-    const accessToken = jwt.sign(userResponse, secretKey);
-
-    // 生成回覆
-    const responseData = {
-        "access_token": accessToken,
-        "user": {
+        // 生成 Access Token
+        const userResponse = {
             id: user.id,
             name: user.name,
-            email:user.email
-        }
-    }
+            email: user.email,
+        };
+        const accessToken = jwt.sign(userResponse, secretKey);
 
-    return responseData;
+        // 生成回覆
+        const responseData = {
+            "access_token": accessToken,
+            "user": {
+                id: user.id,
+                name: user.name,
+                email:user.email
+            }
+        }
+
+        return responseData;
+    }catch(err){
+        throw err
+    }finally{
+        await connection.release();
+    }
+    
 }
 
 // User's Picture
