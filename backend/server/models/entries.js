@@ -60,7 +60,7 @@ async function getAnEntry(user_id, entry_id){
         throw err;
 
     }finally{
-        client.close();
+        await client.close();
     }
 }
 
@@ -94,7 +94,7 @@ async function postAnEntry(user_id, details, timestamp, parent_id){
         throw err;
 
     }finally{
-        client.close();
+        await client.close();
     };
 }
 
@@ -152,7 +152,7 @@ async function deleteAnEntry(user_id, entry_id){
         throw err;
 
     }finally{
-        client.close();
+        await client.close();
     }
 }
 
@@ -194,7 +194,7 @@ async function getEntryHistory(user_id, subject_id, start, end){
         throw err;
 
     }finally{
-        client.close();
+        await client.close();
     }
 }
 
@@ -231,7 +231,7 @@ async function reviseAnEntry(user_id, entry_id, details, timestamp){
         throw err;
 
     }finally{
-        client.close();
+        await client.close();
     }
 }
 

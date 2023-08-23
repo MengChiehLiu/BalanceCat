@@ -28,8 +28,8 @@ class SqlClient{
         this.values = [];
     }
 
-    close(){
-        this.client.release();
+    async close(){
+        await this.client.release();
     };
 
 

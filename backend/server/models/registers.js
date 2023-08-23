@@ -84,7 +84,7 @@ async function getRegisters(user_id, type){
         throw err;
 
     }finally{
-        client.close();
+        await client.close();
     }
 }
 
