@@ -212,6 +212,31 @@ async function signInUsers(email, password) {
     
 }
 
+// Find Picture's URL
+async function getUserPicture(userId) {
+    let connection;
+    try {
+        connection = await pool.getConnection();
+    } catch (err) {
+        console.error("Failed to get connection:", err);
+        throw err;
+    }
+
+    try {
+      const query = 'SELECT picture FROM users WHERE id = ?';
+      const [rows] = await connection.query(query, [userId]);
+      if (rows && rows.length> 0){
+        return rows[0].picture;
+      }
+      return null
+    } catch (error) {
+      console.error('Error getting user picture:', error);
+      throw error;
+    } finally {
+        await connection.release();
+    }
+}
+
 // User's Picture
 async function updateUserPicture(userId, pictureUrl) {
     let connection;
@@ -288,6 +313,7 @@ async function getUserInfo(user_id){
 module.exports = { 
   signUpUsers: signUpUsers,
   signInUsers: signInUsers,
+  getUserPicture:getUserPicture,
   updateUserPicture: updateUserPicture,
   updateUserMemo: updateUserMemo,
   getUserInfo: getUserInfo
