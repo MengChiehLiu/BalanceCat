@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs').promises;
+
 require('dotenv').config();
 
 
@@ -12,7 +14,7 @@ const toCheck_usersSignIn = ['email','password']
 const toCheck_memo = ['title', 'content']
 
 // import models
-const { signUpUsers, signInUsers, updateUserPicture, updateUserMemo, getUserInfo } = require('../models/users')
+const { signUpUsers, signInUsers, getUserPicture, updateUserPicture, updateUserMemo, getUserInfo } = require('../models/users')
 
 
 // Signup
@@ -86,6 +88,14 @@ const upload = multer({ storage: storage });
 async function usersPictureUpdate(req, res) {
     try {
       const userId = req.user.id;
+
+      // 執行刪除舊照片
+      const url = await getUserPicture(userId)
+      if (url != null){
+        const oldPicturePath = 'public/images/' + path.basename(url);
+        await fs.unlink(oldPicturePath);
+        console.log("Deleted Picture");
+      }
   
       await new Promise((resolve, reject) => {
         // 執行圖片上傳
@@ -104,7 +114,13 @@ async function usersPictureUpdate(req, res) {
         });
       });
   
+
+      const protocol = req.protocol;  // 通常是 'http' 或 'https'
+      const host = process.env.BACKEND_HOST;   // 獲取主機名，例如 '127.0.0.1:3000'
+      const serverUrl = `${protocol}://${host}`;
+      const pictureUrl = `${serverUrl}/api/1.0/images/${path.basename(req.file.path)}`;
       const pictureUrl = `https://${process.env.BACKEND_HOST}/api/1.0/images/${path.basename(req.file.path)}`;
+
   
       await updateUserPicture(userId, pictureUrl);
   
