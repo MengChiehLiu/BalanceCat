@@ -39,22 +39,22 @@ function generateEntry(){
     let amount;
     let details;
     
-    if (n > 0.95){ // revenue
+    if (n > 0.975){ // revenue
         amount = Math.floor(Math.random() * (100000 - 50000 + 1)) + 50000;
         details = [{subject_id: 1101, amount: amount}, {subject_id: 4101, amount: -amount}]
-    }else if (n > 0.9){ // other revenues
+    }else if (n > 0.95){ // other revenues
         amount = Math.floor(Math.random() * (10000 - 1000 + 1)) + 1000;
         details = [{subject_id: 1101, amount: amount}, {subject_id: randArr(revenues), amount: -amount}]
-    }else if (n > 0.875){ //LL
-        amount = Math.floor(Math.random() * (30000 - 10000 + 1)) + 10000;
+    }else if (n > 0.925){ //LL
+        amount = Math.floor(Math.random() * (50000 - 10000 + 1)) + 10000;
         details = [{subject_id: 1101, amount: amount}, {subject_id: randArr(LLs), register: {id: null, expired_in: 10}, amount: -amount}]
-    }else if (n > 0.85){  //LA
-        amount = Math.floor(Math.random() * (30000 - 10000 + 1)) + 10000;
+    }else if (n > 0.9){  //LA
+        amount = Math.floor(Math.random() * (50000 - 10000 + 1)) + 10000;
         details = [{subject_id: 1101, amount: -amount}, {subject_id: randArr(LAs), register: {id: null, expired_in: 10}, amount: amount}]
-    }else if (n > 0.825){ // CL
+    }else if (n > 0.875){ // CL
         amount = Math.floor(Math.random() * (3000 - 1000 + 1)) + 1000;
         details = [{subject_id: 1101, amount: amount}, {subject_id: randArr(CLs), amount: -amount}]
-    }else if (n > 0.8){  // CA
+    }else if (n > 0.85){  // CA
         amount = Math.floor(Math.random() * (3000 - 1000 + 1)) + 1000;
         details = [{subject_id: 1101, amount: -amount}, {subject_id: randArr(CAs), amount: amount}]
     }else{  //expenses
@@ -76,11 +76,11 @@ async function generate(){
         const month = new Date(now).getMonth()+1
         const date = new Date(now).getDate()
 
-        // if (month > currMonth){
-        //     console.log(`開始更新${month}月餘額...`)
-        //     await copyBalances(2023, month)
-        //     currMonth += 1
-        // }
+        if (month > currMonth){
+            console.log(`開始更新${month}月餘額...`)
+            await copyBalances(2023, month)
+            currMonth += 1
+        }
         if (month==depreciateMonth && date==28){
             console.log(`開始${month}月折舊...`)
             await depreciate(2023, month);
