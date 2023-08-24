@@ -147,7 +147,7 @@ async function copyBalances(year=null, month=null){
             -- 將當期損益移至保留盈餘
             UPDATE temp_table AS t1
             JOIN temp_table_2 AS t2 ON t1.user_id = t2.user_id
-            SET t1.amount = t2.amount, t2.amount = 0
+            SET t1.amount = t1.amount+t2.amount, t2.amount = 0
             WHERE t1.subject_id = 3100;
 
             -- 損益歸零
