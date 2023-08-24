@@ -165,7 +165,7 @@ INSERT INTO subjects (id, name, is_debit, parent_id) VALUES
 
 
 -- mock data
-INSERT INTO users (name, email, password, last_updated) VALUES ('Jack', 'test@gmail.com', '$2b$10$utwwc71ynkivAvGZom5GQOGTWJ0iYMwfdWB1cGZjSpaQGFMa3JWvu', '2023-03-01');
+INSERT INTO users (name, email, password) VALUES ('Jack', 'test@gmail.com', '$2b$10$utwwc71ynkivAvGZom5GQOGTWJ0iYMwfdWB1cGZjSpaQGFMa3JWvu');
 INSERT INTO entries (user_id, timestamp) VALUES
     (1, '2023/03/01 00:00:00'),
     (1, '2023/03/01 00:00:00'),
